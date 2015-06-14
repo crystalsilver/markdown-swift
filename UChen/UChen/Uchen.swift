@@ -6,10 +6,9 @@
 //  Copyright (c) 2015 Leanne Northrop. All rights reserved.
 //
 import Foundation
-import UChen
 
-public struct Uchen {
-    public let WylieMap = [
+public struct UChen {
+    let WylieMap = [
         // Consonants
         "k" : "\u{0F40}",
         "kh" : "\u{0F41}",
@@ -301,7 +300,7 @@ public struct Uchen {
         "(" : "\u{0F3C}",
         ")" : "\u{0F3D}",
     ]
-    public let WylieLigatures = [
+    let WylieLigatures = [
         // Ligatures & Special Character or Character Combinations
         "rk" : "r+k",
         "rg" : "r+g",

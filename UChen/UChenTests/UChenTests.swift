@@ -23,27 +23,16 @@ class UChenTests: XCTestCase {
     }
     
     func testUchenIsDefined() {
-        var uchen : Uchen = Uchen()
-        XCTAssertNotNil(uchen.WylieMap["k"])
-        XCTAssertNotNil(uchen.WylieLigatures["rk"])
+        var uchen : UChen = UChen()
     }
     
-    func testUchenSortedWylieMap() {
-        var uchen = Uchen()
-        var wylieKeys = uchen.WylieMap.keys.array
-        wylieKeys.sort { count($0) > count($1) }
-        XCTAssertEqual("+dzha", wylieKeys[0], "Expected sorted keys array")
-    }
-    
-    func testUchenSortedLigaturesMap() {
-        var uchen = Uchen()
-        var keys = uchen.WylieLigatures.keys.array
-        keys.sort { count($0) > count($1) }
-        XCTAssertEqual("~kurukashimikchen", keys[0], "Expected sorted keys array")
+    func testSorting() {
+        var uchen : UChen = UChen()
+        XCTAssertEqual("+dzha", uchen._sortedKeys[0], "Keys incorrectly sorted?")
     }
     
     func testTranslate() {
-        var uchen = Uchen()
+        var uchen = UChen()
         XCTAssertEqual("སང་གྱེ", uchen.translate("sang gye"), "Not producing expected output")
         XCTAssertEqual("དུསུམ", uchen.translate("dusum"), "Wrong uchen translation for 'dusum'")
         XCTAssertEqual("དུསུམ་ཁེཡནཔ", uchen.translate("dusum kheynpa"), "Wrong uchen translation for sang gye sang gye rdorje")

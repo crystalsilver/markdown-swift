@@ -11,6 +11,7 @@
 		D507FDA21B2C600B00424352 /* UChen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D507FD961B2C600B00424352 /* UChen.framework */; };
 		D507FDA91B2C600B00424352 /* UChenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D507FDA81B2C600B00424352 /* UChenTests.swift */; };
 		D507FDB31B2C604500424352 /* Uchen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D507FDB21B2C604500424352 /* Uchen.swift */; };
+		D5E3D9BA1B2DB62000376C56 /* Uchen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D507FDB21B2C604500424352 /* Uchen.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -221,6 +222,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D507FDA91B2C600B00424352 /* UChenTests.swift in Sources */,
+				D5E3D9BA1B2DB62000376C56 /* Uchen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +405,7 @@
 				D507FDAE1B2C600B00424352 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D507FDAF1B2C600B00424352 /* Build configuration list for PBXNativeTarget "UChenTests" */ = {
 			isa = XCConfigurationList;
@@ -411,6 +414,7 @@
 				D507FDB11B2C600B00424352 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
