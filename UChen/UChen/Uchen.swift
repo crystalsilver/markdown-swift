@@ -485,21 +485,14 @@ public struct Uchen {
             }
             return result;
         }
-        
-        func parseSyllable (syllable : String) -> String {
-            var result = "";
-            result = apply(apply(syllable, _sortedLigatureKeys, WylieLigatures), _sortedKeys, WylieMap);
-            return result;
-        }
 
         var result = "";
         
-        var syllables : [String] = text.componentsSeparatedByString(" ");
-        var tsheg : String = self.WylieMap[" "]!
-        for (var i : Int = 0; i < syllables.count; i++) {
-            if i == syllables.count - 1 { tsheg = "" }
-            result += parseSyllable(syllables[i]) + tsheg;
-        }
+        result = text.stringByReplacingOccurrencesOfString(" ",
+            withString: self.WylieMap[" "]!,
+            options: NSStringCompareOptions.LiteralSearch,
+            range: nil)
+        result = apply(apply(result, _sortedLigatureKeys, WylieLigatures), _sortedKeys, WylieMap)
         
         return result;
 
