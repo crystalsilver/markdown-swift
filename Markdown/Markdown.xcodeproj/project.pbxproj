@@ -10,8 +10,10 @@
 		D5E3D93F1B2DA51900376C56 /* Markdown.h in Headers */ = {isa = PBXBuildFile; fileRef = D5E3D93E1B2DA51900376C56 /* Markdown.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D5E3D9451B2DA51900376C56 /* Markdown.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E3D9391B2DA51900376C56 /* Markdown.framework */; };
 		D5E3D94C1B2DA51A00376C56 /* MarkdownTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3D94B1B2DA51A00376C56 /* MarkdownTests.swift */; };
-		D5E3D9581B2DA5B100376C56 /* Wylie.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3D9571B2DA5B100376C56 /* Wylie.swift */; };
 		D5E3D9B71B2DB53600376C56 /* UChen.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D5E3D9B61B2DB53600376C56 /* UChen.framework */; };
+		D5E3D9BC1B2DB85200376C56 /* WylieDialect.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3D9BB1B2DB85200376C56 /* WylieDialect.swift */; };
+		D5E3D9BD1B2DB85200376C56 /* WylieDialect.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3D9BB1B2DB85200376C56 /* WylieDialect.swift */; };
+		D5E3D9C11B2DC30500376C56 /* WylieDialectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5E3D9C01B2DC30500376C56 /* WylieDialectTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,8 +33,9 @@
 		D5E3D9441B2DA51900376C56 /* MarkdownTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MarkdownTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5E3D94A1B2DA51A00376C56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D5E3D94B1B2DA51A00376C56 /* MarkdownTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownTests.swift; sourceTree = "<group>"; };
-		D5E3D9571B2DA5B100376C56 /* Wylie.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Wylie.swift; sourceTree = "<group>"; };
 		D5E3D9B61B2DB53600376C56 /* UChen.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UChen.framework; path = "../UChen/build/Debug-iphoneos/UChen.framework"; sourceTree = "<group>"; };
+		D5E3D9BB1B2DB85200376C56 /* WylieDialect.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WylieDialect.swift; sourceTree = "<group>"; };
+		D5E3D9C01B2DC30500376C56 /* WylieDialectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WylieDialectTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +82,7 @@
 			children = (
 				D5E3D93E1B2DA51900376C56 /* Markdown.h */,
 				D5E3D93C1B2DA51900376C56 /* Supporting Files */,
-				D5E3D9571B2DA5B100376C56 /* Wylie.swift */,
+				D5E3D9BB1B2DB85200376C56 /* WylieDialect.swift */,
 			);
 			path = Markdown;
 			sourceTree = "<group>";
@@ -97,6 +100,7 @@
 			children = (
 				D5E3D94B1B2DA51A00376C56 /* MarkdownTests.swift */,
 				D5E3D9491B2DA51A00376C56 /* Supporting Files */,
+				D5E3D9C01B2DC30500376C56 /* WylieDialectTests.swift */,
 			);
 			path = MarkdownTests;
 			sourceTree = "<group>";
@@ -216,7 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D5E3D9581B2DA5B100376C56 /* Wylie.swift in Sources */,
+				D5E3D9BC1B2DB85200376C56 /* WylieDialect.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +229,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D5E3D94C1B2DA51A00376C56 /* MarkdownTests.swift in Sources */,
+				D5E3D9BD1B2DB85200376C56 /* WylieDialect.swift in Sources */,
+				D5E3D9C11B2DC30500376C56 /* WylieDialectTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
