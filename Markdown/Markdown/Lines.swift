@@ -30,24 +30,7 @@ struct Lines {
             source = source.substringFromIndex(startIndex)
         }
         
-        // Match until the end of the string, a newline followed by #, or two or more newlines.
-        /* original javascript var re = "([\\s\\S]+?)($|\\n#|\\n(?:\\s*\\n|$)+)"
-        var lines = source.matches(re)
-        for var i = 0; i < lines.count; i = i + 3 {
-            if (lines[i] == "\n#") {
-                _lines.append(Line(text: lines[i+1],
-                                   lineNumber: line_no,
-                                   trailing: "\n"))
-                lines[i+3] = "#" + lines[i+3]
-            } else {
-                _lines.append(Line(text: lines[i+1],
-                                   lineNumber: line_no,
-                                   trailing: lines[i+2]))
-            }
-            line_no += lines[i].split("\n").count - 1
-        }*/
-        
-        // simplify to not split on regular expression groups until find use case
+        // simplified from js lib to not split on regular expression groups until find use case
         var storedLines : [Line] = []
         source.enumerateLines({
             (line: String, inout stop: Bool) -> () in
