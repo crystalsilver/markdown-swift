@@ -8,18 +8,19 @@
 
 import Foundation
 
-struct Line {
-    private var _lineNumber:Int = -1
-    private var _text:String = ""
-    private var _trailing:String = "\n\n"
+struct Line : Printable {
+    var _lineNumber:Int = -1
+    var _text:String = ""
+    var _trailing:String = "\n\n"
+    var description:String {
+        get {
+            return self._lineNumber.description + " " + self._text + self._trailing
+        }
+    }
     
     init(text:String, lineNumber:Int = -1, trailing:String = "\n\n"){
         self._lineNumber = lineNumber
         self._trailing = trailing
         self._text = text
     }
-    
-    func lineNumber() -> Int { return self._lineNumber }
-    func trailing() -> String { return self._trailing }
-    func text() -> String { return self._text }
 }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D56E3BE71B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
 		D56E3BE81B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
+		D56E3BEA1B2F1D4600344701 /* LinesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE91B2F1D4600344701 /* LinesTest.swift */; };
 		D59F21541B2DF77E0030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21551B2DF7980030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21571B2DF7CF0030E6BB /* Lines.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21561B2DF7CF0030E6BB /* Lines.swift */; };
@@ -38,6 +39,7 @@
 
 /* Begin PBXFileReference section */
 		D56E3BE61B2F0EEC00344701 /* Markdown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
+		D56E3BE91B2F1D4600344701 /* LinesTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinesTest.swift; sourceTree = "<group>"; };
 		D59F21531B2DF77E0030E6BB /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		D59F21561B2DF7CF0030E6BB /* Lines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lines.swift; sourceTree = "<group>"; };
 		D59F21591B2DF9640030E6BB /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				D5E3D94B1B2DA51A00376C56 /* MarkdownTests.swift */,
 				D5E3D9491B2DA51A00376C56 /* Supporting Files */,
 				D5E3D9C01B2DC30500376C56 /* WylieDialectTests.swift */,
+				D56E3BE91B2F1D4600344701 /* LinesTest.swift */,
 			);
 			path = MarkdownTests;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				D59F215B1B2DF9640030E6BB /* StringExtensions.swift in Sources */,
 				D5E3D94C1B2DA51A00376C56 /* MarkdownTests.swift in Sources */,
 				D59F21581B2DF7CF0030E6BB /* Lines.swift in Sources */,
+				D56E3BEA1B2F1D4600344701 /* LinesTest.swift in Sources */,
 				D59F21551B2DF7980030E6BB /* Line.swift in Sources */,
 				D56E3BE81B2F0EEC00344701 /* Markdown.swift in Sources */,
 				D5E3D9BD1B2DB85200376C56 /* WylieDialect.swift in Sources */,

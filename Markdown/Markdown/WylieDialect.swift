@@ -30,7 +30,7 @@ func blockWylie(line : Line, var next : Lines) -> [AnyObject]? {
     var reStartBlock = "^:::\n*"
     var reEndBlock = "([\\s\\S\\W\\w\n\r]*?)(\n*:::)(.*)"
     
-    var block = line.text()
+    var block = line._text
     if !block.isMatch(reStartBlock) {
         return nil
     }
@@ -52,7 +52,7 @@ func blockWylie(line : Line, var next : Lines) -> [AnyObject]? {
             } else {
                 wylie = wylie! + b
                 if !next.isEmpty() {
-                    b = next.shift()!.text()
+                    b = next.shift()!._text
                 } else {
                     b = ""
                     seen = true

@@ -68,4 +68,13 @@ extension String {
         let searchString:String = self
         return searchString.stringByReplacingOccurrencesOfString(find, withString: replacement, options: NSStringCompareOptions.LiteralSearch, range: nil)
     }
+    
+    public func split(separator: String) -> [String] {
+        return self.componentsSeparatedByString(separator)
+    }
+    
+    public func isBlank() -> Bool {
+        var str = self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+        return count(str) == 0
+    }
 }

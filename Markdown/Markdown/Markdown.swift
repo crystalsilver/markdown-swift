@@ -8,6 +8,11 @@
 
 import Foundation
 
+public func markdownParse(source : String, dialect : String) -> [AnyObject] {
+    var md : Markdown = Markdown(dialectName: dialect)
+    return md.parse(source)
+}
+
 public class Markdown {
     static let dialects :[String:Dialect] = ["wylie":WylieDialect()]
     var dialect : Dialect
@@ -22,6 +27,31 @@ public class Markdown {
             self.dialect = Markdown.dialects["wylie"]!
         } else {
             self.dialect = dialect!
+        }
+    }
+    
+    public func parse(source : String) -> [AnyObject] {
+        return self.toTree(source)
+    }
+    
+    public func toTree(source : String) -> [AnyObject] {
+        var tree : [AnyObject] = ["markdown"]
+        var lines : Lines = Lines(source: source)
+            
+        while !lines.isEmpty() {
+            var processedLine = self._processBlock(lines.shift(), next : lines)
+    
+            tree.append(processedLine)
+        }
+        
+        return tree
+    }
+    
+    func _processBlock(line : Line?, next : Lines) -> [AnyObject] {
+        if line == nil {
+            return []
+        } else {
+            return []
         }
     }
 }
