@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D56E3BE71B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
+		D56E3BE81B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
 		D59F21541B2DF77E0030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21551B2DF7980030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21571B2DF7CF0030E6BB /* Lines.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21561B2DF7CF0030E6BB /* Lines.swift */; };
@@ -35,6 +37,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D56E3BE61B2F0EEC00344701 /* Markdown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
 		D59F21531B2DF77E0030E6BB /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		D59F21561B2DF7CF0030E6BB /* Lines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lines.swift; sourceTree = "<group>"; };
 		D59F21591B2DF9640030E6BB /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
@@ -99,6 +102,7 @@
 				D59F21561B2DF7CF0030E6BB /* Lines.swift */,
 				D59F21591B2DF9640030E6BB /* StringExtensions.swift */,
 				D59F215C1B2E000D0030E6BB /* Dialect.swift */,
+				D56E3BE61B2F0EEC00344701 /* Markdown.swift */,
 			);
 			path = Markdown;
 			sourceTree = "<group>";
@@ -240,6 +244,7 @@
 				D5E3D9BC1B2DB85200376C56 /* WylieDialect.swift in Sources */,
 				D59F215D1B2E000D0030E6BB /* Dialect.swift in Sources */,
 				D59F21541B2DF77E0030E6BB /* Line.swift in Sources */,
+				D56E3BE71B2F0EEC00344701 /* Markdown.swift in Sources */,
 				D59F21571B2DF7CF0030E6BB /* Lines.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -252,6 +257,7 @@
 				D5E3D94C1B2DA51A00376C56 /* MarkdownTests.swift in Sources */,
 				D59F21581B2DF7CF0030E6BB /* Lines.swift in Sources */,
 				D59F21551B2DF7980030E6BB /* Line.swift in Sources */,
+				D56E3BE81B2F0EEC00344701 /* Markdown.swift in Sources */,
 				D5E3D9BD1B2DB85200376C56 /* WylieDialect.swift in Sources */,
 				D59F215E1B2E000D0030E6BB /* Dialect.swift in Sources */,
 				D5E3D9C11B2DC30500376C56 /* WylieDialectTests.swift in Sources */,
