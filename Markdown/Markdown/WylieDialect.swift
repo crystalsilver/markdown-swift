@@ -8,55 +8,15 @@
 import Foundation
 import UChen
 
-extension String {
-    public subscript (r: Range<Int>) -> String {
-        get {
-            let startIndex = advance(self.startIndex, r.startIndex)
-            let endIndex = advance(startIndex, r.endIndex - r.startIndex)
-            
-            return self[Range(start: startIndex, end: endIndex)]
-        }
-    }
-    
-    public func substr(startIndex:Int, length:Int) -> String {
-        return self[startIndex...(startIndex+length)]
-    }
-}
-
-func inlineWylie( text : String ) -> [AnyObject] {
-    func isMatch(searchString : String, pattern : String)->Bool{
-        let match = searchString.rangeOfString(pattern, options: .RegularExpressionSearch)
-        return match != nil
-    }
-    
-    func matches(searchString : String, pattern : String)->[String]{
-        var ierror:NSError?
-        let regex = NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions.allZeros, error: &ierror)
-        
-        if (ierror == nil){
-            let matches = regex!.matchesInString(searchString, options: NSMatchingOptions.allZeros, range: NSMakeRange(0, count(searchString)))
-            var matchedStrings:[String] = []
-            for match in matches {
-                var result : NSTextCheckingResult = match as! NSTextCheckingResult
-                for var i = 0; i < result.numberOfRanges; i++ {
-                    let matchedTextRange:NSRange = result.rangeAtIndex(i)
-                    var s = searchString.substr(matchedTextRange.location,length:matchedTextRange.length-1)
-                    matchedStrings += [s]
-                }
-            }
-            return matchedStrings
-        }
-        return []
-    }
-    
+func inlineWylie( text : String ) -> [AnyObject] {    
     // Inline wylie block.
     let pattern : String = "(~+)(([\\s\\S\\W\\w]*?)\\1)"
-    if isMatch(text, pattern) {
-        var matches : [String] = matches(text, pattern)
+    if text.isMatch(pattern) {
+        var matches : [String] = text.matches(pattern)
         var wylie = matches[3]
         var uchenUnicodeStr = UChen().translate(wylie)
         var length : Int = count(matches[0]) + count(wylie)
-        return [length.description, [ "uchen", [ "style": "font-size:72pt;font-family:Uchen_05"], uchenUnicodeStr ] ];
+        return [length.description, [ "uchen", [ "style": "font-size:72pt;font-family:Uchen_05"], uchenUnicodeStr ]]
     }
     else {
         // TODO: No matching end code found - warn!
@@ -64,6 +24,60 @@ func inlineWylie( text : String ) -> [AnyObject] {
     }
 }
 
-struct WylieDialect {
-    let inline : Dictionary<String, (String) -> [AnyObject]> = ["~":inlineWylie]
+func blockWylie(line : Line, var next : Lines) -> [AnyObject]? {
+    var ret = []
+    var re = "^(:::\n*)([\\s\\S\\W\\w\n\r]*?)(\\1)"
+    var reStartBlock = "^:::\n*"
+    var reEndBlock = "([\\s\\S\\W\\w\n\r]*?)(\n*:::)(.*)"
+    
+    var block = line.text()
+    if !block.isMatch(reStartBlock) {
+        return nil
+    }
+    
+    var wylie : String? = "";
+    var groups = block.matches(re)
+    if groups != nil && !groups.isEmpty {
+        wylie = groups[2]
+    } else {
+        // wylie is over several lines
+        var seen = false
+        var b = block.replace(":::", replacement: "");
+        while !seen {
+            if b.isMatch(reEndBlock) {
+                var m = b.matches(reEndBlock)
+                var str : String = m[1]
+                wylie = wylie! + str
+                seen = true
+            } else {
+                wylie = wylie! + b
+                if !next.isEmpty() {
+                    b = next.shift()!.text()
+                } else {
+                    b = ""
+                    seen = true
+                    // user supplied invalid syntax of no more text lines
+                    // and forgot to end block with :::
+                }
+            }
+        }
+    }
+    
+    if wylie != nil && count(wylie!) > 0 {
+        var uchenUnicodeStr = UChen().translate(wylie!)
+        println(uchenUnicodeStr)
+        return  [["uchen_block", ["class": "uchen", "wylie": wylie!], uchenUnicodeStr]]
+    } else {
+        return []
+    }
+}
+
+class WylieDialect : Dialect {
+    override init() {
+        super.init()
+        self.inline["~"] = inlineWylie
+        self.block["wylie"] = blockWylie
+        //buildBlockOrder()
+        //buildInlinePatterns()
+    }
 }
