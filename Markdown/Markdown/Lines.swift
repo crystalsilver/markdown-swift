@@ -8,8 +8,15 @@
 
 import Foundation
 
-struct Lines {
+struct Lines : Printable {
     var _lines : [Line] = []
+    var description : String {
+        var text:String = ""
+        for line in _lines {
+            print(line._text + line._trailing)
+        }
+        return text
+    }
     
     init() {}
     
@@ -30,24 +37,27 @@ struct Lines {
             source = source.substringFromIndex(startIndex)
         }
         
-        // simplified from js lib to not split on regular expression groups until find use case
         var storedLines : [Line] = []
-        source.enumerateLines({
-            (line: String, inout stop: Bool) -> () in
-            if line.isEmpty || line.isBlank() {
-                line_no++
-                if !storedLines.isEmpty {
-                    var previousLine : Line = storedLines.removeLast()
-                    storedLines.append(Line(text: previousLine._text,
-                                            lineNumber: previousLine._lineNumber,
-                                            trailing: previousLine._trailing + line + "\n"))
-                }
+        
+        // Match until the end of the string, a newline followed by #, or two or more newlines.
+        var re = "([\\s\\S]+?)($|\\n#|\\n(?:\\s*\\n|$)+)"
+        var lines = source.matches(re)
+        for var i = 0; i < lines.count; i = i + 3 {
+            if (lines[i] == "\n#") {
+                storedLines.append(Line(text: lines[i+1],
+                                   lineNumber: line_no,
+                                   trailing: "\n"))
+                lines[i+3] = "#" + lines[i+3]
             } else {
-                storedLines.append(Line(text: line,
-                                        lineNumber: line_no++,
-                                        trailing: "\n"))
+                var t = i+2 == lines.count-1 ? "\n" : lines[i+2]
+                storedLines.append(Line(text: lines[i+1],
+                                   lineNumber: line_no,
+                                   trailing: t))
             }
-        })
+            line_no += lines[i].split("\n").count - 1
+        }
+        
+
         self._lines = storedLines
     }
     

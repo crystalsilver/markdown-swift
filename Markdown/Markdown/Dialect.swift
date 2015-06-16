@@ -11,26 +11,34 @@ import Foundation
 class Dialect {
     var inline : Dictionary<String, (String) -> [AnyObject]> = [:]
     var block : Dictionary<String, (Line,Lines) -> [AnyObject]?> = [:]
-    var blockKeys : [String] = []
     var __patterns__ : String
-    var __call__ : (String,String?)->[String]
+    var __inline_call__ : (Line,String?)->[AnyObject]
+    var __block_call__ : (Line,Lines)->[AnyObject]?
+    var __order__ : [String]
     
     init() {
         self.__patterns__ = ""
-        self.__call__ = {
-            (text:String, pattern:String?) -> [String] in
+        self.__order__ = []
+        self.__inline_call__ = {
+            (Line,String) -> [AnyObject] in
             return []
+        }
+        self.__block_call__ = {
+            (Line,Lines)->[AnyObject]? in
+            return nil
         }
     }
     
     func buildBlockOrder() {
-        self.blockKeys = [];
+        var blockKeys : [String] = []
         for key in block.keys {
             if key == "__order__" || key == "__call__" {
+                self.__block_call__ = self.block["__call__"]!
                 continue
             }
             blockKeys.append(key)
         }
+        self.__order__ = blockKeys
     }
     
     func buildInlinePatterns() {
@@ -39,7 +47,21 @@ class Dialect {
         for key in inline.keys {
             // __foo__ is reserved and not a pattern
             if key.isMatch("^__.*__$") {
-                continue;
+                if key.isMatch("^__call__$") {
+                    let me = self
+                    let fn : (Line,String?)->[AnyObject]
+                    fn = __inline_call__
+                    self.__inline_call__ = {
+                        (text:Line, pattern:String?) -> [AnyObject] in
+                        if pattern != nil {
+                            return fn(text, pattern!)
+                        }
+                        else {
+                            return fn(text, me.__patterns__)
+                        }
+                    }
+                }
+                continue
             }
             
             // Prep regular expressions - dislike this but replace with reg ex groups not working at present
@@ -53,16 +75,5 @@ class Dialect {
         }
 
         self.__patterns__  = "|".join(patterns)
-        var __patterns__ = self.__patterns__
-        var fn = self.__call__
-        self.__call__ = {
-            (text:String, pattern:String?) -> [String] in
-            if pattern != nil {
-                return fn(text, pattern)
-            }
-            else {
-                return fn(text, __patterns__)
-            }
-        }
     }
 }

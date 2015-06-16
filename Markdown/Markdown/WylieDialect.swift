@@ -77,7 +77,7 @@ class WylieDialect : Dialect {
         super.init()
         self.inline["~"] = inlineWylie
         self.block["wylie"] = blockWylie
-        //buildBlockOrder()
-        //buildInlinePatterns()
+        buildBlockOrder()
+        buildInlinePatterns()
     }
 }

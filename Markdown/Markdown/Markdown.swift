@@ -34,24 +34,54 @@ public class Markdown {
         return self.toTree(source)
     }
     
-    public func toTree(source : String) -> [AnyObject] {
+    func toTree(source : String) -> [AnyObject] {
         var tree : [AnyObject] = ["markdown"]
         var lines : Lines = Lines(source: source)
             
         while !lines.isEmpty() {
-            var processedLine = self._processBlock(lines.shift(), next : lines)
-    
-            tree.append(processedLine)
+            var processedLine = self.processBlock(lines.shift(), next : lines)
+            if processedLine != nil {
+                tree.append(processedLine!)
+            }
         }
         
         return tree
     }
     
-    func _processBlock(line : Line?, next : Lines) -> [AnyObject] {
+    func processBlock(line : Line?, next : Lines) -> [AnyObject]? {
         if line == nil {
             return []
         } else {
-            return []
+            var dialect = self.dialect
+            
+            if dialect.block["__call__"] != nil {
+                return dialect.block["__call__"]!(line!, next)
+            } else {
+                var blockHandlers = dialect.block
+                var ord = dialect.__order__
+                for var i = 0; i < ord.count; i++ {
+                    var res = blockHandlers[ord[i]]!(line!, next)
+                    if res != nil {
+                        var r : [AnyObject] = res!
+                        var node : [AnyObject]? = r[0] as? [AnyObject]
+                        if (!r.isEmpty && node == nil) {
+                            println(ord[i] + " didn't return proper JsonML")
+                        } else if node != nil &&
+                                  node!.isEmpty &&
+                                  node![0] as? String == nil {
+                            println(ord[i] + " didn't return proper JsonML")
+                        }
+                        
+                        return res
+                    }
+                }
+            }
+            
+            return nil
         }
+    }
+    
+    func processInline(line : Line, patterns: String?)->[AnyObject]{
+        return self.dialect.__inline_call__(line, patterns)
     }
 }
