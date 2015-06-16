@@ -81,7 +81,7 @@ public class Markdown {
         }
     }
     
-    func processInline(line : Line, patterns: String?)->[AnyObject]{
-        return self.dialect.__inline_call__(line, patterns)
+    func processInline(line : String, patterns: String?)->[AnyObject] {
+        return self.dialect.processInline(line, patterns: patterns)
     }
 }

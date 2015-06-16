@@ -12,7 +12,7 @@ class Dialect {
     var inline : Dictionary<String, (String) -> [AnyObject]> = [:]
     var block : Dictionary<String, (Line,Lines) -> [AnyObject]?> = [:]
     var __patterns__ : String
-    var __inline_call__ : (Line,String?)->[AnyObject]
+    var __inline_call__ : (String,String?)->[AnyObject]
     var __block_call__ : (Line,Lines)->[AnyObject]?
     var __order__ : [String]
     
@@ -20,11 +20,11 @@ class Dialect {
         self.__patterns__ = ""
         self.__order__ = []
         self.__inline_call__ = {
-            (Line,String) -> [AnyObject] in
+            (text : String, pattern : String?) -> [AnyObject] in
             return []
         }
         self.__block_call__ = {
-            (Line,Lines)->[AnyObject]? in
+            (line : Line,var next : Lines)->[AnyObject]? in
             return nil
         }
     }
@@ -47,20 +47,6 @@ class Dialect {
         for key in inline.keys {
             // __foo__ is reserved and not a pattern
             if key.isMatch("^__.*__$") {
-                if key.isMatch("^__call__$") {
-                    let me = self
-                    let fn : (Line,String?)->[AnyObject]
-                    fn = __inline_call__
-                    self.__inline_call__ = {
-                        (text:Line, pattern:String?) -> [AnyObject] in
-                        if pattern != nil {
-                            return fn(text, pattern!)
-                        }
-                        else {
-                            return fn(text, me.__patterns__)
-                        }
-                    }
-                }
                 continue
             }
             
@@ -75,5 +61,50 @@ class Dialect {
         }
 
         self.__patterns__  = "|".join(patterns)
+        let me = self
+        let fn : (String,String?)->[AnyObject]
+        fn = __inline_call__
+        self.__inline_call__ = {
+            (text:String, pattern:String?) -> [AnyObject] in
+            if pattern != nil {
+                return fn(text, pattern!)
+            }
+            else {
+                return fn(text, me.__patterns__)
+            }
+        }
+    }
+    
+    func oneElement(text : String, var patterns : String) -> [AnyObject] {
+        var res : [AnyObject] = []
+        var regEx = "([\\s\\S]*?)(" + patterns + ")"
+        
+        if (!text.isMatch(regEx)) {
+            // Just boring text
+            res = [count(text), text]
+        }
+        else {
+            var matches = text.matches(regEx)
+            if matches.count >= 2 {
+                if count(matches[1]) > 0 {
+                    // Some un-interesting text matched. Return that first
+                    return [count(matches[1]), matches[1]]
+                } else if matches.count >= 3 {
+                    var handlerRegEx = matches[2]
+                    if self.inline[handlerRegEx] != nil {
+                        res = self.inline[handlerRegEx]!(matches[0])
+                        res = res.isEmpty ? [count(matches[2]), matches[2]] : res
+                    } else {
+                        res = [count(matches[2]), matches[2]]
+                    }
+                }
+            }
+        }
+        
+        return res
+    }
+    
+    func processInline(line : String, patterns: String?)->[AnyObject] {
+        return self.__inline_call__(line, patterns)
     }
 }

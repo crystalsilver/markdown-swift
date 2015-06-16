@@ -26,8 +26,8 @@ extension String {
             for match in matches {
                 var result : NSTextCheckingResult = match as! NSTextCheckingResult
                 for var i = 0; i < result.numberOfRanges; i++ {
-                    let matchedTextRange:NSRange = result.rangeAtIndex(i)
-                    var s = searchString.substr(matchedTextRange.location,length:matchedTextRange.length-1)
+                    let matchedTextRange = result.rangeAtIndex(i)
+                    var s = searchString.substringWithRange(matchedTextRange)
                     matchedStrings += [s]
                 }
             }
@@ -36,18 +36,23 @@ extension String {
         return nil
     }
     
-    public subscript (r: Range<Int>) -> String {
-        get {
-            let startIndex = advance(self.startIndex, r.startIndex)
-            let endIndex = advance(startIndex, r.endIndex - r.startIndex)
-            
-            return self[Range(start: startIndex, end: endIndex)]
+    public func substringWithRange(range : NSRange) -> String {
+        if range.length == 0 {
+            return ""
+        } else {
+            let ix1 = advance(self.startIndex, range.location)
+            let ix2 = advance(ix1,range.length-1)
+            let r = ix1...ix2
+            return self[r]
         }
     }
     
     public func substr(startIndex : Int, length : Int) -> String {
         if length > 0 {
-            return self[startIndex...(startIndex+length)]
+            let ix1 = advance(self.startIndex, startIndex)
+            let ix2 = advance(ix1,length)
+            let r = ix1...ix2
+            return self[r]
         } else {
             return self
         }
