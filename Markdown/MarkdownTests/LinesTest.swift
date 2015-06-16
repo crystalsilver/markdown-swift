@@ -27,7 +27,7 @@ class LinesTest: XCTestCase {
         
         var firstLine = lines[0]
         XCTAssertEqual("# Getting Started!", firstLine._text)
-        XCTAssertEqual("\n", firstLine._trailing)
+        XCTAssertEqual("\n  \n", firstLine._trailing)
         XCTAssertEqual(4, firstLine._lineNumber)
         
         var secondLine = lines[1]

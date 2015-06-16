@@ -36,6 +36,12 @@ struct Lines {
             (line: String, inout stop: Bool) -> () in
             if line.isEmpty || line.isBlank() {
                 line_no++
+                if !storedLines.isEmpty {
+                    var previousLine : Line = storedLines.removeLast()
+                    storedLines.append(Line(text: previousLine._text,
+                                            lineNumber: previousLine._lineNumber,
+                                            trailing: previousLine._trailing + line + "\n"))
+                }
             } else {
                 storedLines.append(Line(text: line,
                                         lineNumber: line_no++,
