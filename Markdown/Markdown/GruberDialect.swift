@@ -8,26 +8,6 @@
 
 import Foundation
 
-func gruberInlineCode(text : String) -> [AnyObject] {
-    // Inline code block. as many backticks as you like to start it
-    // Always skip over the opening ticks.
-    var regEx = "(`+)(([\\s\\S]*?)\\1)"
-    
-    if text.isMatch(regEx) {
-        var m = text.matches(regEx)
-        var length = count(m[1]) + count(m[2])
-        return [length, [ "inlinecode", m[3]]]
-    }
-    else {
-        // TODO: No matching end code found - warn!
-        return [1, "`"]
-    }
-}
-
-func gruberLineBreak(text : String) -> [AnyObject] {
-    return [3, ["linebreak"]]
-}
-
 class GruberDialect : Dialect {
     override init() {
         super.init()
@@ -85,8 +65,33 @@ class GruberDialect : Dialect {
                     next.unshift(l)
                 }
                 
-                return [ header ];
+                return [header]
             }
+        }
+        self.block["extHeader"] = {
+            (block : Line, var next : Lines) -> [AnyObject]? in
+            var regEx = "^(.*)\n([-=])\\2\\2+(?:\n|$)"
+
+            if !block._text.isMatch(regEx) {
+                return nil
+            }
+
+            var matches = block._text.matches(regEx)
+            var level = (matches[2] == "=") ? 1 : 2
+            var header : [AnyObject] = ["header", ["level" : level]]
+            var processedHeader = self.processInline(matches[1], patterns: nil)
+            if (processedHeader.count == 1 && processedHeader[0] as? String != nil) {
+                header.append(processedHeader[0] as! String)
+            } else {
+                header.append(processedHeader)
+            }
+            
+            var length : Int = count(matches[0])
+            if length < count(block._text) {
+                next.unshift(Line(text: block._text.substr(length), lineNumber: block._lineNumber + 2, trailing: block._trailing))
+            }
+            
+            return [header]
         }
         self.block["para"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
@@ -95,8 +100,28 @@ class GruberDialect : Dialect {
             return arr
         }
         
-        self.inline["`"]    = gruberInlineCode
-        self.inline["  \n"] = gruberLineBreak
+        self.inline["`"]    = {
+            (text : String) -> [AnyObject] in
+            // Inline code block. as many backticks as you like to start it
+            // Always skip over the opening ticks.
+            var regEx = "(`+)(([\\s\\S]*?)\\1)"
+            
+            if text.isMatch(regEx) {
+                var m = text.matches(regEx)
+                var length = count(m[1]) + count(m[2])
+                return [length, [ "inlinecode", m[3]]]
+            }
+            else {
+                // TODO: No matching end code found - warn!
+                return [1, "`"]
+            }
+        }
+
+        self.inline["\n"] = {
+            (text : String) -> [AnyObject] in
+            return [3, ["linebreak"]]
+        }
+
         self.inline["**"]   = super.strong_em("strong", md: "**")
         self.inline["__"]   = super.strong_em("strong", md: "__")
         self.inline["*"]    = super.strong_em("em", md: "*")
