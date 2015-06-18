@@ -42,7 +42,7 @@ class GruberDialect : Dialect {
                 while ( count(text) > 0 ) {
                     res = super.oneElement(text, patterns: pattern!)
                     var strCount = res.removeAtIndex(0) as! Int
-                    text = strCount >= count(str) ? "" : text.substr(0, length: strCount)
+                    text = strCount >= count(text) ? "" : text.substr(strCount)
                     for element in res {
                         if out.isEmpty {
                             out.append(element)
@@ -88,9 +88,19 @@ class GruberDialect : Dialect {
                 return [ header ];
             }
         }
+        self.block["para"] = {
+            (block : Line, var next : Lines) -> [AnyObject]? in
+            var arr : [AnyObject] = ["para"]
+            arr += self.processInline(block._text, patterns: nil)
+            return arr
+        }
         
-        self.inline["`"] = gruberInlineCode
+        self.inline["`"]    = gruberInlineCode
         self.inline["  \n"] = gruberLineBreak
+        self.inline["**"]   = super.strong_em("strong", md: "**")
+        self.inline["__"]   = super.strong_em("strong", md: "__")
+        self.inline["*"]    = super.strong_em("em", md: "*")
+        self.inline["_"]    = super.strong_em("em", md: "_")
         
         buildBlockOrder()
         buildInlinePatterns()

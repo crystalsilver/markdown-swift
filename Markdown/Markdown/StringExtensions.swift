@@ -58,6 +58,15 @@ extension String {
         }
     }
     
+    public func substr(startIndex : Int) -> String {
+        if startIndex > 0 {
+            let ix1 = advance(self.startIndex, startIndex)
+            return self.substringFromIndex(ix1)
+        } else {
+            return self
+        }
+    }
+    
     public func replaceByRegEx(pattern : String, replacement : String)->String!{
         let searchString:String = self
         var error:NSError?

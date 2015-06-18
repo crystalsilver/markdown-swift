@@ -34,5 +34,22 @@ class GruberDialectTests: XCTestCase {
         XCTAssertNotNil(r[1]["level"])
         XCTAssertEqual(1, r[1]["level"] as! Int)
     }
+    
+    func testSimpleParagraphContainingEmphasizedText() {
+        var line = Line(text: "This is *emphasised text* with some following text.", lineNumber: 0, trailing: "\n\n")
+        
+        var result = self.gruberDialect.block["para"]!(line, Lines())
+        
+        XCTAssertNotNil(result)
+        var r = result!
+        XCTAssertTrue(r.count > 0)
+        XCTAssertEqual("para", r[0] as! String)
+        XCTAssertEqual("This is ", r[1] as! String)
+        XCTAssertNotNil(r[2])
+        var e = r[2] as! [AnyObject]
+        XCTAssertEqual("em", e[0] as! String)
+        XCTAssertEqual("emphasised text", e[1] as! String)
+        XCTAssertEqual(" with some following text.", r[3] as! String)
+    }
 
 }
