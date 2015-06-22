@@ -13,6 +13,9 @@
 		D56E3BE71B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
 		D56E3BE81B2F0EEC00344701 /* Markdown.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE61B2F0EEC00344701 /* Markdown.swift */; };
 		D56E3BEA1B2F1D4600344701 /* LinesTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = D56E3BE91B2F1D4600344701 /* LinesTest.swift */; };
+		D57A5EE31B38438E00286CF3 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57A5EE21B38438E00286CF3 /* Renderer.swift */; };
+		D57A5EE51B3843AB00286CF3 /* HtmlRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57A5EE41B3843AB00286CF3 /* HtmlRenderer.swift */; };
+		D57A5EE71B38440300286CF3 /* XmlRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D57A5EE61B38440300286CF3 /* XmlRenderer.swift */; };
 		D59F21541B2DF77E0030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21551B2DF7980030E6BB /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21531B2DF77E0030E6BB /* Line.swift */; };
 		D59F21571B2DF7CF0030E6BB /* Lines.swift in Sources */ = {isa = PBXBuildFile; fileRef = D59F21561B2DF7CF0030E6BB /* Lines.swift */; };
@@ -47,6 +50,9 @@
 		D5030CAF1B3037550073803A /* GruberDialectTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GruberDialectTests.swift; sourceTree = "<group>"; };
 		D56E3BE61B2F0EEC00344701 /* Markdown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Markdown.swift; sourceTree = "<group>"; };
 		D56E3BE91B2F1D4600344701 /* LinesTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinesTest.swift; sourceTree = "<group>"; };
+		D57A5EE21B38438E00286CF3 /* Renderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Renderer.swift; sourceTree = "<group>"; };
+		D57A5EE41B3843AB00286CF3 /* HtmlRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HtmlRenderer.swift; sourceTree = "<group>"; };
+		D57A5EE61B38440300286CF3 /* XmlRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XmlRenderer.swift; sourceTree = "<group>"; };
 		D59F21531B2DF77E0030E6BB /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		D59F21561B2DF7CF0030E6BB /* Lines.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lines.swift; sourceTree = "<group>"; };
 		D59F21591B2DF9640030E6BB /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
@@ -115,6 +121,9 @@
 				D59F215C1B2E000D0030E6BB /* Dialect.swift */,
 				D56E3BE61B2F0EEC00344701 /* Markdown.swift */,
 				D5030CAC1B30371A0073803A /* GruberDialect.swift */,
+				D57A5EE21B38438E00286CF3 /* Renderer.swift */,
+				D57A5EE41B3843AB00286CF3 /* HtmlRenderer.swift */,
+				D57A5EE61B38440300286CF3 /* XmlRenderer.swift */,
 			);
 			path = Markdown;
 			sourceTree = "<group>";
@@ -257,12 +266,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D57A5EE31B38438E00286CF3 /* Renderer.swift in Sources */,
 				D59F215A1B2DF9640030E6BB /* StringExtensions.swift in Sources */,
 				D5E3D9BC1B2DB85200376C56 /* WylieDialect.swift in Sources */,
 				D59F215D1B2E000D0030E6BB /* Dialect.swift in Sources */,
+				D57A5EE71B38440300286CF3 /* XmlRenderer.swift in Sources */,
 				D5030CAD1B30371A0073803A /* GruberDialect.swift in Sources */,
 				D59F21541B2DF77E0030E6BB /* Line.swift in Sources */,
 				D56E3BE71B2F0EEC00344701 /* Markdown.swift in Sources */,
+				D57A5EE51B3843AB00286CF3 /* HtmlRenderer.swift in Sources */,
 				D59F21571B2DF7CF0030E6BB /* Lines.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -29,14 +29,15 @@ class ModuleUnitTests: XCTestCase {
         for (test,file) in tests {
             let testName = name
             let mdInputFile = file
-            let mdOutputFile = file.replace(".text", replacement: ".json")
+            let mdOutputFile = file.replace(".text", replacement: ".xml")
             let markdown = readFile(mdInputFile, type: "text")
             if !markdown.isBlank() {
-                let expected = readFile(mdOutputFile, type: "json")
+                let expected = readFile(mdOutputFile, type: "xml")
                 if !expected.isBlank() {
                     let md : Markdown = Markdown()
                     let result : [AnyObject] = md.parse(markdown)
-                    XCTAssertEqual(expected, result.description, testName + " test failed")
+                    let xml = XmlRenderer().toXML(result, includeRoot: true)
+                    XCTAssertEqual(expected, xml, testName + " test failed")
                 }
             }
         }

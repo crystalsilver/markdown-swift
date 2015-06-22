@@ -123,7 +123,7 @@ class GruberDialect : Dialect {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]
             arr += self.processInline(block._text, patterns: nil)
-            return arr
+            return [arr]
         }
         
         self.inline["`"]    = {

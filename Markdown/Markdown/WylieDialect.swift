@@ -21,7 +21,7 @@ class WylieDialect : GruberDialect {
                 var wylie = matches[3]
                 var uchenUnicodeStr = UChen().translate(wylie)
                 var length : Int = count(matches[0])
-                return [length, [ "uchen", [ "style": "font-size:72pt;font-family:Uchen_05"], uchenUnicodeStr ]]
+                return [length, [ "uchen", [ "class": "tibetan_uchen", "wylie" : wylie], uchenUnicodeStr ]]
             }
             else {
                 // TODO: No matching end code found - warn!
