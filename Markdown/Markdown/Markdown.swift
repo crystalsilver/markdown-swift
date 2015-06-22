@@ -16,6 +16,10 @@ public func markdownParse(source : String, dialect : String) -> [AnyObject] {
 public class Markdown {
     static let dialects :[String:Dialect] = ["wylie":WylieDialect()]
     var dialect : Dialect
+
+    public convenience init(){
+        self.init(dialect: Markdown.dialects["wylie"]!)
+    }
     
     public convenience init(dialectName : String){
         self.init(dialect: Markdown.dialects[dialectName]!)

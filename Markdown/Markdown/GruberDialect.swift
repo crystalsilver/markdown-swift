@@ -93,6 +93,32 @@ class GruberDialect : Dialect {
             
             return [header]
         }
+        self.block["horizRule"] = {
+            (block : Line, var next : Lines) -> [AnyObject]? in
+            
+            let regEx = "^(?:([\\s\\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\\2){2,}[ \t]*(?:\n([\\s\\S]*))?$"
+            
+            if !block._text.isMatch(regEx) {
+                return nil
+            }
+            
+            // this needs to find any hr in the block to handle abutting blocks
+            var matches = block._text.matches(regEx)
+            var jsonml : [AnyObject] = [["hr"]]
+            
+            // if there's a leading abutting block, process it
+            if matches.count >= 2 {
+                var contained = Line(text: matches[1], lineNumber: block._lineNumber, trailing: "")
+                //TODO jsonml.insert(self.toTree( contained, [] ) , atIndex: 0)
+            }
+            
+            // if there's a trailing abutting block, stick it into next
+            if matches.count >= 4 {
+                next.unshift(Line(text: matches[3], lineNumber: block._lineNumber + 1, trailing: block._trailing))
+            }
+            
+            return jsonml
+        }
         self.block["para"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]

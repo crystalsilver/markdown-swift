@@ -86,7 +86,7 @@ class GruberDialectTests: XCTestCase {
         var line = Line(text: "This is `var v = 3; inline code` with some following text.", lineNumber: 0, trailing: "\n\n")
         
         var result = self.gruberDialect.block["para"]!(line, Lines())
-        
+        println(result!)
         XCTAssertNotNil(result)
         var r = result!
         XCTAssertTrue(r.count > 0)
