@@ -34,7 +34,8 @@ class Dialect {
     
     func buildBlockOrder() {
         var blockKeys : [String] = []
-        for key in block.keys {
+        let sortedKeys = Array(self.block.keys).sorted(<)
+        for key in sortedKeys {
             if key == "__order__" || key == "__call__" {
                 self.__block_call__ = self.block["__call__"]!
                 continue

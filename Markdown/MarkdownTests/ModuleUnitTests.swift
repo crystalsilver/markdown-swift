@@ -20,6 +20,10 @@ class ModuleUnitTests: XCTestCase {
         super.tearDown()
     }
 
+    func testHeaders() {
+        runTests("headers")
+    }
+    
     func testWylie() {
         runTests("wylie")
     }
@@ -27,7 +31,7 @@ class ModuleUnitTests: XCTestCase {
     func runTests(subDir:String) -> () {
         let tests : [String:String] = getFilenames(subDir)
         for (test,file) in tests {
-            let testName = name
+            let testName = test
             let mdInputFile = file
             let mdOutputFile = file.replace(".text", replacement: ".xml")
             let markdown = readFile(mdInputFile, type: "text")

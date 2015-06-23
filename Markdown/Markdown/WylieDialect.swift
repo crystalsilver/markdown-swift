@@ -29,7 +29,7 @@ class WylieDialect : GruberDialect {
             }
         }
         
-        self.block["wylie"] = {
+        self.block["0_wylie"] = {
             (line : Line, var next : Lines) -> [AnyObject]? in
             var ret = []
             var re = "^(:::\n*)([\\s\\S\\W\\w\n\r]*?)(\\1)"

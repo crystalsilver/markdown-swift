@@ -42,7 +42,7 @@ class GruberDialect : Dialect {
             return out
         }
 
-        self.block["atxHeader"] = {
+        self.block["0_atxHeader"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var regEx = "^(#{1,6})\\s*(.*?)\\s*#*\\s*(?:\n|$)"
             
@@ -52,7 +52,7 @@ class GruberDialect : Dialect {
                 var matches = block._text.matches(regEx)
                 
                 var level : Int = count(matches[1])
-                var header : [AnyObject] = ["header", ["level": level]]
+                var header : [AnyObject] = ["header", ["level": String(level)]]
                 var processedHeader = self.processInline(matches[2], patterns: nil)
                 if (processedHeader.count == 1 && processedHeader[0] as? String != nil) {
                     header.append(processedHeader[0] as! String)
@@ -68,7 +68,7 @@ class GruberDialect : Dialect {
                 return [header]
             }
         }
-        self.block["extHeader"] = {
+        self.block["1_extHeader"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var regEx = "^(.*)\n([-=])\\2\\2+(?:\n|$)"
 
@@ -78,7 +78,7 @@ class GruberDialect : Dialect {
 
             var matches = block._text.matches(regEx)
             var level = (matches[2] == "=") ? 1 : 2
-            var header : [AnyObject] = ["header", ["level" : level]]
+            var header : [AnyObject] = ["header", ["level" : String(level)]]
             var processedHeader = self.processInline(matches[1], patterns: nil)
             if (processedHeader.count == 1 && processedHeader[0] as? String != nil) {
                 header.append(processedHeader[0] as! String)
@@ -93,7 +93,7 @@ class GruberDialect : Dialect {
             
             return [header]
         }
-        self.block["horizRule"] = {
+        self.block["2_horizRule"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             
             let regEx = "^(?:([\\s\\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\\2){2,}[ \t]*(?:\n([\\s\\S]*))?$"
@@ -119,7 +119,7 @@ class GruberDialect : Dialect {
             
             return jsonml
         }
-        self.block["para"] = {
+        self.block["3_para"] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]
             arr += self.processInline(block._text, patterns: nil)

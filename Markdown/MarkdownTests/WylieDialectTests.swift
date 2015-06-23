@@ -24,19 +24,21 @@ class WylieDialectTests: XCTestCase {
 
     func testInline() {
         var result = self.wylieDialect.inline["~"]!("~rdorje~")
-        XCTAssertEqual("14", result[0] as! String, "Expecting length of text to be replaced")
+        XCTAssertEqual(8, result[0] as! Int, "Expecting length of text to be replaced")
         
         var jsonML : [AnyObject] = result[1] as! [AnyObject]
         XCTAssertEqual("uchen", jsonML[0] as! String, "Expecting uchen JsonML")
         XCTAssertEqual("རྡོརྗེ", jsonML[2] as! String, "Not translated correctly")
         
         var attr : [String:String] = jsonML[1] as! [String:String]
-        XCTAssertNotNil(attr["style"], "Style attribute missing?")
-        XCTAssertEqual("font-size:72pt;font-family:Uchen_05", attr["style"]!, "Style attribute missing?")
+        XCTAssertNotNil(attr["class"], "Class attribute missing?")
+        XCTAssertEqual("tibetan_uchen", attr["class"]!, "Class attribute missing?")
+        XCTAssertNotNil(attr["wylie"], "Class attribute missing?")
+        XCTAssertEqual("rdorje", attr["wylie"]!, "Wylie attribute missing?")
     }
     
     func testBlockReturnsNilWhenNoMatch() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
         
         var result = f(Line(text: "this shouldn't match at all",lineNumber:0),Lines())
         
@@ -45,7 +47,7 @@ class WylieDialectTests: XCTestCase {
 
     func testBlock() {
         var text : String = ":::rdorje sangaye jinpa losal rinpoche ddddddderdorje sangaye:::"
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
         
         var result : [AnyObject]? = f(Line(text: text,lineNumber:0),Lines())
         
@@ -61,7 +63,7 @@ class WylieDialectTests: XCTestCase {
     }
     
     func testTrailingBlock() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
         var firstBlockLine = Line(text: ":::rdorje", lineNumber:1)
         var nextBlockLines = Lines()
         nextBlockLines._lines.append(Line(text: "sanggye",   lineNumber:2))
