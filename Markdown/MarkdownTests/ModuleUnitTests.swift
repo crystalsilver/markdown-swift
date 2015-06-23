@@ -33,11 +33,16 @@ class ModuleUnitTests: XCTestCase {
             let markdown = readFile(mdInputFile, type: "text")
             if !markdown.isBlank() {
                 let expected = readFile(mdOutputFile, type: "xml")
+                let md : Markdown = Markdown()
+                let result : [AnyObject] = md.parse(markdown)
                 if !expected.isBlank() {
-                    let md : Markdown = Markdown()
-                    let result : [AnyObject] = md.parse(markdown)
                     let xml = XmlRenderer().toXML(result, includeRoot: true)
                     XCTAssertEqual(expected, xml, testName + " test failed")
+                }
+                let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
+                if !expectedHTML.isBlank() {
+                    let html = HtmlRenderer().toHTML(result)
+                    XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
                 }
             }
         }
