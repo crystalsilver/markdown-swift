@@ -126,6 +126,54 @@ class GruberDialect : Dialect {
             return [arr]
         }
         
+        self.inline["!["] = {
+            (text : String) -> [AnyObject] in
+            
+            // Unlike images, alt text is plain text only. no other elements are
+            // allowed in there
+            
+            // ![Alt text](/path/to/img.jpg "Optional title")
+            //      1          2            3       4         <--- captures
+            //
+            // First attempt to use a strong URL regexp to catch things like parentheses. If it misses, use the
+            // old one.
+            let newRegExPattern = "^!\\[(.*?)][ \\t]*\\((" + self.URL_REG_EX + ")\\)([ \\t])*([\"'].*[\"'])?"
+            let oldRegExPattern = "^!\\[(.*?)\\][ \\t]*\\([ \\t]*([^\")]*?)(?:[ \\t]+([\"'])(.*?)\\3)?[ \\t]*\\)"
+            let matchesNewRegEx = text.isMatch(newRegExPattern)
+            let matchesOldRegEx = text.isMatch(oldRegExPattern)
+            
+            if matchesNewRegEx || matchesOldRegEx {
+                var m : [String] = matchesNewRegEx ? text.matches(newRegExPattern) : text.matches(oldRegExPattern)
+                if m.count > 2 && !m[2].isBlank() {
+                    var m2 = m[2]
+                    if m2.isMatch("^<") && m2.isMatch(">$") {
+                        m[2] = m2.substr(1, length: count(m2)-1)
+                    }
+                }
+                
+                var processedText = self.processInline(m[2], patterns: "\\")
+                m[2] = processedText.count == 0 ? "" : processedText[0] as! String
+
+                var attrs : [String:String] = ["alt" : m[1], "href" : m[2]]
+                if m.count > 5 && !m[4].isBlank() {
+                    attrs["title"] = m[4]
+                }
+                
+                return [count(m[0]), ["img", attrs]]
+            }
+            
+            // ![Alt text][id]
+            if text.isMatch("^!\\[(.*?)\\][ \\t]*\\[(.*?)\\]"){
+                var m = text.matches("^!\\[(.*?)\\][ \\t]*\\[(.*?)\\]")
+                // We can't check if the reference is known here as it likely wont be
+                // found till after. Check it in md tree->hmtl tree conversion
+                return [count(m[0]), ["img_ref", ["alt" : m[1], "ref" : m[2].lowercaseString, "original" : m[0]]]]
+            }
+            
+            // Just consume the '!['
+            return [2, "!["]
+        }
+        
         self.inline["<"] = {
             (text : String) -> [AnyObject] in
                 

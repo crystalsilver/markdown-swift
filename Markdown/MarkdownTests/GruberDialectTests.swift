@@ -156,4 +156,23 @@ class GruberDialectTests: XCTestCase {
         XCTAssertEqual("bill@microsoft.com", e[2] as! String)
         XCTAssertEqual(" get autolinkified.", r[3] as! String)
     }
+    
+    
+    func testAltImageWithTitle() {
+        var line = Line(text: "![Alt text](/path/to/img.jpg \"Optional title\")",
+            lineNumber: 0, trailing: "\n\n")
+        
+        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result!.count > 0)
+        var r: AnyObject = result![0]
+        XCTAssertEqual("para", r[0] as! String)
+
+        var img: [AnyObject] = r[1] as! [AnyObject]
+        XCTAssertEqual("img", img[0] as! String)
+        var attrs : [String:String] = img[1] as! [String:String]
+        XCTAssertEqual("Alt text", attrs["alt"]!)
+        XCTAssertEqual("/path/to/img.jpg", attrs["href"]!)
+    }
 }
