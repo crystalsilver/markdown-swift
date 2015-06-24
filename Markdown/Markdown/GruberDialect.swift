@@ -126,6 +126,25 @@ class GruberDialect : Dialect {
             return [arr]
         }
         
+        self.inline["<"] = {
+            (text : String) -> [AnyObject] in
+                
+            if text.isMatch("^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\\.[a-zA-Z]+))>") {
+                let m = text.matches("^<(?:((https?|ftp|mailto):[^>]+)|(.*?@.*?\\.[a-zA-Z]+))>")
+                if m.count == 4 && !m[3].isBlank() {
+                    return [count(m[0]), [ "link", ["href": "mailto:" + m[3]], m[3]]]
+                }
+                else if m.count > 3 && m[2] == "mailto" {
+                    return [count(m[0]), [ "link", ["href": m[1]], m[1].substr(count("mailto:"))]]
+                }
+                else {
+                    return [count(m[0]), [ "link", ["href": m[1]], m[1]]]
+                }
+            }
+            
+            return [1, "<"]
+        }
+        
         self.inline["`"]    = {
             (text : String) -> [AnyObject] in
             // Inline code block. as many backticks as you like to start it

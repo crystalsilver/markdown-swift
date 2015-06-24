@@ -72,7 +72,7 @@ class GruberDialectTests: XCTestCase {
         
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
-        var r = result![0]
+        var r: AnyObject = result![0]
         XCTAssertEqual("para", r[0] as! String)
         XCTAssertEqual("This is ", r[1] as! String)
         XCTAssertNotNil(r[2])
@@ -89,7 +89,7 @@ class GruberDialectTests: XCTestCase {
 
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
-        var r = result![0]
+        var r: AnyObject = result![0]
         XCTAssertEqual("para", r[0] as! String)
         XCTAssertEqual("This is ", r[1] as! String)
         XCTAssertNotNil(r[2])
@@ -115,4 +115,24 @@ class GruberDialectTests: XCTestCase {
         XCTAssertEqual("With a line break", r[3] as! String)
     }*/
 
+    func testAutoLinkOfURL() {
+        var line = Line(text: "URLs like <http://google.com> get autolinkified.",
+            lineNumber: 0, trailing: "\n\n")
+        
+        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result!.count > 0)
+        var r: AnyObject = result![0]
+        XCTAssertEqual("para", r[0] as! String)
+        XCTAssertEqual("URLs like ", r[1] as! String)
+        XCTAssertNotNil(r[2])
+        var e = r[2] as! [AnyObject]
+        XCTAssertEqual("link", e[0] as! String)
+        var e2 = e[1] as! [String:String]
+        XCTAssertNotNil(e2["href"])
+        XCTAssertEqual("http://google.com", e2["href"]!)
+        XCTAssertEqual("http://google.com", e[2] as! String)
+        XCTAssertEqual(" get autolinkified.", r[3] as! String)
+    }
 }
