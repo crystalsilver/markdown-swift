@@ -135,4 +135,25 @@ class GruberDialectTests: XCTestCase {
         XCTAssertEqual("http://google.com", e[2] as! String)
         XCTAssertEqual(" get autolinkified.", r[3] as! String)
     }
+    
+    func testAutoLinkOfEmail() {
+        var line = Line(text: "Email addresses written like <bill@microsoft.com> get autolinkified.",
+            lineNumber: 0, trailing: "\n\n")
+        
+        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result!.count > 0)
+        var r: AnyObject = result![0]
+        XCTAssertEqual("para", r[0] as! String)
+        XCTAssertEqual("Email addresses written like ", r[1] as! String)
+        XCTAssertNotNil(r[2])
+        var e = r[2] as! [AnyObject]
+        XCTAssertEqual("link", e[0] as! String)
+        var e2 = e[1] as! [String:String]
+        XCTAssertNotNil(e2["href"])
+        XCTAssertEqual("mailto:bill@microsoft.com", e2["href"]!)
+        XCTAssertEqual("bill@microsoft.com", e[2] as! String)
+        XCTAssertEqual(" get autolinkified.", r[3] as! String)
+    }
 }
