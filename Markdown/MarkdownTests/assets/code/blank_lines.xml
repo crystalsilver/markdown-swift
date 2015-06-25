@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<markdown><para>This block is composed of three lines:</para><code_block>one
+
+three</code_block><code_block>three</code_block><para>This block is composed of 5</para><code_block>one
+
+
+four</code_block><code_block>four</code_block><para>This block is composed of 2</para><code_block>two</code_block></markdown>
