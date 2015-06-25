@@ -9,8 +9,8 @@
 import XCTest
 import Markdown
 
-class ModuleUnitTests: XCTestCase {
-    let bundle = NSBundle(forClass: ModuleUnitTests.self)
+class WylieIntegrationTests : XCTestCase {
+    let bundle = NSBundle(forClass: WylieIntegrationTests.self)
     
     override func setUp() {
         super.setUp()
