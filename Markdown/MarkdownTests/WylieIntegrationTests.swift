@@ -23,6 +23,10 @@ class WylieIntegrationTests : XCTestCase {
     func testHeaders() {
         runTests("headers")
     }
+
+    func testCode() {
+        runTests("code")
+    }
     
     func testWylie() {
         runTests("wylie")
@@ -40,13 +44,23 @@ class WylieIntegrationTests : XCTestCase {
                 let md : Markdown = Markdown()
                 let result : [AnyObject] = md.parse(markdown)
                 if !expected.isBlank() {
+                    println("-------------------------------------------------------------------------------")
+                    println("    Running XML " + testName);
+                    println("")
                     let xml = XmlRenderer().toXML(result, includeRoot: true)
                     XCTAssertEqual(expected, xml, testName + " test failed")
+                    println("-------------------------------------------------------------------------------")
+                    println("")
                 }
                 let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
                 if !expectedHTML.isBlank() {
+                    println("-------------------------------------------------------------------------------")
+                    println("    Running HTML " + testName);
+                    println("")
                     let html = HtmlRenderer().toHTML(result)
                     XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
+                    println("-------------------------------------------------------------------------------")
+                    println("")
                 }
             }
         }

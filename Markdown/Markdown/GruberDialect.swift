@@ -13,6 +13,7 @@ class GruberDialect : Dialect {
     static let ATX_HEADER_HANDLER_KEY : String = "0_atxHeader"
     static let EXT_HEADER_HANDLER_KEY : String = "1_extHeader"
     static let HORZ_RULE_HANDLER_KEY : String = "3_horizRule"
+    static let CODE_HANDLER_KEY : String = "4_code"
     static let PARA_HANDLER_KEY : String = "9_para"
     
     override init() {
@@ -126,6 +127,58 @@ class GruberDialect : Dialect {
             
             return jsonml
         }
+
+        self.block[GruberDialect.CODE_HANDLER_KEY] = {
+            (block : Line, var next : Lines) -> [AnyObject]? in
+            // |    Foo
+            // |bar
+            // should be a code block followed by a paragraph. Fun
+            //
+            // There might also be adjacent code block to merge.
+            var text = block._text
+            var ret : [String] = []
+            let regEx = "^(?: {0,3}\t| {4})(.*)\n?"
+            
+            // 4 spaces + content
+            if !text.isMatch(regEx) {
+                return ret
+            }
+            
+            do {
+                // Now pull out the rest of the lines
+                var b = super.loop_re_over_block(regEx, block: text, cb: {
+                    (m : [String]) -> () in
+                    ret.append(m[1])
+                })
+                
+                if count(b) > 0 {
+                    // Case alluded to in first comment. push it back on as a new block
+                    next.unshift(Line(text: b, lineNumber: block._lineNumber, trailing: block._trailing))
+                    break
+                }
+                else if !next.isEmpty() {
+                    // Check the next block - it might be code too
+                    if !next.line(0)._text.isMatch(regEx) {
+                        break
+                    }
+                    
+                    // Pull how how many blanks lines follow - minus two to account for .join
+                    ret.append(block._trailing.replaceByRegEx("[^\\n]", replacement: "").substr(2))
+                    
+                    let line = next.shift()
+                    if line != nil {
+                        text = line!._text
+                    }
+                }
+                else {
+                    break
+                }
+            } while true
+            
+
+            return [["code_block", "\n".join(ret)]]
+        }
+        
         self.block[GruberDialect.PARA_HANDLER_KEY] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]

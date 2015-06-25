@@ -15,6 +15,7 @@ class GruberDialectTests: XCTestCase {
     let ATX_HEADER_HANDLER_KEY : String = GruberDialect.ATX_HEADER_HANDLER_KEY
     let EXT_HEADER_HANDLER_KEY : String = GruberDialect.EXT_HEADER_HANDLER_KEY
     let HORZ_RULE_HANDLER_KEY : String = GruberDialect.HORZ_RULE_HANDLER_KEY
+    let CODE_HANDLER_KEY : String = GruberDialect.CODE_HANDLER_KEY
     
     override func setUp() {
         super.setUp()
@@ -179,5 +180,19 @@ class GruberDialectTests: XCTestCase {
         var attrs : [String:String] = img[1] as! [String:String]
         XCTAssertEqual("Alt text", attrs["alt"]!)
         XCTAssertEqual("/path/to/img.jpg", attrs["href"]!)
+    }
+    
+    func testCodeBlock() {
+        var line = Line(text: "    tell application \"Foo\"\n        beep\n    end tell\n        tab\n",
+            lineNumber: 0, trailing: "\n\n")
+        
+        var result = self.gruberDialect.block[CODE_HANDLER_KEY]!(line, Lines())
+        
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result!.count > 0)
+        var r : [String] = result![0] as! [String]
+        XCTAssertTrue(r.count == 2)
+        XCTAssertEqual("code_block", r[0])
+        XCTAssertEqual("tell application \"Foo\"\n    beep\nend tell\n    tab", r[1])
     }
 }

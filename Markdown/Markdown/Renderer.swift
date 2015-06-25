@@ -29,15 +29,19 @@ public class Renderer {
     
     func render_tree(var jsonml: [AnyObject]) -> String {
         var tag = jsonml.removeAtIndex(0)
+        
         if tag is [AnyObject] {
             return render_tree(tag as! [AnyObject])
         }
+        
         var tagName : String = tag as! String
         var attributes : [String:String] = [:]
         var content : [String] = []
         
-        if jsonml[0] is Dictionary<String,String> {
-            attributes = jsonml.removeAtIndex(0) as! Dictionary<String,String>
+        if jsonml.count > 0 {
+            if jsonml[0] is Dictionary<String,String> {
+                attributes = jsonml.removeAtIndex(0) as! Dictionary<String,String>
+            }
         }
         
         while jsonml.count > 0 {

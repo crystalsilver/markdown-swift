@@ -65,7 +65,7 @@ public class Markdown {
                 var ord = dialect.__order__
                 for var i = 0; i < ord.count; i++ {
                     var res = blockHandlers[ord[i]]!(line!, next)
-                    if res != nil {
+                    if res != nil && res!.count > 0 {
                         var r : [AnyObject] = res!
                         var node : [AnyObject]? = r[0] as? [AnyObject]
                         if (!r.isEmpty && node == nil) {

@@ -170,4 +170,15 @@ class Dialect {
         
         return anon
     }
+    
+    func loop_re_over_block(regEx : String, var block : String, cb : ([String]) -> ()) -> String {
+        // Dont use /g regexps with this
+        while (count(block) > 0) && block.isMatch(regEx) {
+            var m = block.matches(regEx)
+            block = block.substr(count(m[0]))            
+            cb(m)
+        }
+        
+        return block
+    }
 }

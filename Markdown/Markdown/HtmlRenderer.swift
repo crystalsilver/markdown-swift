@@ -99,26 +99,15 @@ public class HtmlRenderer: Renderer {
             case "code_block":
                 jsonml[0] = "pre"
                 var j = attrs != nil ? 2 : 1
-                var k = 1
-                if attrs != nil {
-                    k = 2
-                }
                 var code : [AnyObject] = ["code"]
-                for var a = k; a < (jsonml.count - k); a++ {
-                    code.append(jsonml.removeAtIndex(a))
-                }
-                jsonml[k] = code
+                code.extend(jsonml[j...jsonml.count-j])
+                jsonml[j] = code
             case "uchen_block":
                 jsonml[0] = "p"
-                var k = 1
-                if attrs != nil {
-                    k = 2
-                }
+                var j = attrs != nil ? 2 : 1
                 var uchen : [AnyObject] = ["uchen"]
-                for var a = k; a < (jsonml.count - k); a++ {
-                    uchen.append(jsonml.removeAtIndex(a))
-                }
-                jsonml[k] = uchen
+                uchen.extend(jsonml[j...jsonml.count-j])
+                jsonml[j] = uchen
             case "uchen":
                 jsonml[0] = "span"
             case "inlinecode":
