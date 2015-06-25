@@ -11,10 +11,12 @@ import XCTest
 
 class WylieDialectTests: XCTestCase {
     var wylieDialect: WylieDialect! = nil
+    var WYLIE_BLOCK_HANDLER_KEY : String = ""
     
     override func setUp() {
         super.setUp()
         self.wylieDialect = WylieDialect()
+        self.WYLIE_BLOCK_HANDLER_KEY = WylieDialect.WYLIE_BLOCK_HANDLER_KEY
     }
     
     override func tearDown() {
@@ -38,7 +40,7 @@ class WylieDialectTests: XCTestCase {
     }
     
     func testBlockReturnsNilWhenNoMatch() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
         
         var result = f(Line(text: "this shouldn't match at all",lineNumber:0),Lines())
         
@@ -47,7 +49,7 @@ class WylieDialectTests: XCTestCase {
 
     func testBlock() {
         var text : String = ":::rdorje sangaye jinpa losal rinpoche ddddddderdorje sangaye:::"
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
         
         var result : [AnyObject]? = f(Line(text: text,lineNumber:0),Lines())
         
@@ -63,7 +65,7 @@ class WylieDialectTests: XCTestCase {
     }
     
     func testTrailingBlock() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block["0_wylie"]!
+        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
         var firstBlockLine = Line(text: ":::rdorje", lineNumber:1)
         var nextBlockLines = Lines()
         nextBlockLines._lines.append(Line(text: "sanggye",   lineNumber:2))

@@ -9,6 +9,12 @@
 import Foundation
 
 class GruberDialect : Dialect {
+    // Key values determine block handler orders
+    static let ATX_HEADER_HANDLER_KEY : String = "0_atxHeader"
+    static let EXT_HEADER_HANDLER_KEY : String = "1_extHeader"
+    static let HORZ_RULE_HANDLER_KEY : String = "3_horizRule"
+    static let PARA_HANDLER_KEY : String = "9_para"
+    
     override init() {
         super.init()
         
@@ -42,7 +48,7 @@ class GruberDialect : Dialect {
             return out
         }
 
-        self.block["0_atxHeader"] = {
+        self.block[GruberDialect.ATX_HEADER_HANDLER_KEY] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var regEx = "^(#{1,6})\\s*(.*?)\\s*#*\\s*(?:\n|$)"
             
@@ -68,7 +74,7 @@ class GruberDialect : Dialect {
                 return [header]
             }
         }
-        self.block["1_extHeader"] = {
+        self.block[GruberDialect.EXT_HEADER_HANDLER_KEY] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var regEx = "^(.*)\n([-=])\\2\\2+(?:\n|$)"
 
@@ -93,7 +99,8 @@ class GruberDialect : Dialect {
             
             return [header]
         }
-        self.block["2_horizRule"] = {
+        
+        self.block[GruberDialect.HORZ_RULE_HANDLER_KEY] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             
             let regEx = "^(?:([\\s\\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\\2){2,}[ \t]*(?:\n([\\s\\S]*))?$"
@@ -119,7 +126,7 @@ class GruberDialect : Dialect {
             
             return jsonml
         }
-        self.block["3_para"] = {
+        self.block[GruberDialect.PARA_HANDLER_KEY] = {
             (block : Line, var next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]
             arr += self.processInline(block._text, patterns: nil)

@@ -11,6 +11,11 @@ import XCTest
 class GruberDialectTests: XCTestCase {
     var gruberDialect : GruberDialect! = nil
     
+    let PARA_BLOCK_HANDLER_KEY : String = GruberDialect.PARA_HANDLER_KEY
+    let ATX_HEADER_HANDLER_KEY : String = GruberDialect.ATX_HEADER_HANDLER_KEY
+    let EXT_HEADER_HANDLER_KEY : String = GruberDialect.EXT_HEADER_HANDLER_KEY
+    let HORZ_RULE_HANDLER_KEY : String = GruberDialect.HORZ_RULE_HANDLER_KEY
+    
     override func setUp() {
         super.setUp()
         self.gruberDialect = GruberDialect()
@@ -23,7 +28,7 @@ class GruberDialectTests: XCTestCase {
     func testSimpleLevel1HeaderBlock() {
         var line = Line(text: "# This is a level 1 heading", lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["0_atxHeader"]!(line, Lines())
+        var result = self.gruberDialect.block[ATX_HEADER_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         var r : [AnyObject] = result![0] as! [AnyObject]
@@ -38,7 +43,7 @@ class GruberDialectTests: XCTestCase {
     func testSimpleExtLevel1HeaderBlock() {
         var line = Line(text: "This is a level 1 heading\n======================", lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["1_extHeader"]!(line, Lines())
+        var result = self.gruberDialect.block[EXT_HEADER_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         var r : [AnyObject] = result![0] as! [AnyObject]
@@ -53,7 +58,7 @@ class GruberDialectTests: XCTestCase {
     func testSimpleExtLevel2HeaderBlock() {
         var line = Line(text: "This is a level 2 heading\n--------------------", lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["1_extHeader"]!(line, Lines())
+        var result = self.gruberDialect.block[EXT_HEADER_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         var r : [AnyObject] = result![0] as! [AnyObject]
@@ -68,7 +73,7 @@ class GruberDialectTests: XCTestCase {
     func testSimpleParagraphContainingEmphasizedText() {
         var line = Line(text: "This is *emphasised text* with some following text.", lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
@@ -85,7 +90,7 @@ class GruberDialectTests: XCTestCase {
     func testSimpleParagraphContainingInlineCode() {
         var line = Line(text: "This is `var v = 3; inline code` with some following text.", lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
 
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
@@ -119,7 +124,7 @@ class GruberDialectTests: XCTestCase {
         var line = Line(text: "URLs like <http://google.com> get autolinkified.",
             lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
@@ -140,7 +145,7 @@ class GruberDialectTests: XCTestCase {
         var line = Line(text: "Email addresses written like <bill@microsoft.com> get autolinkified.",
             lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)
@@ -162,7 +167,7 @@ class GruberDialectTests: XCTestCase {
         var line = Line(text: "![Alt text](/path/to/img.jpg \"Optional title\")",
             lineNumber: 0, trailing: "\n\n")
         
-        var result = self.gruberDialect.block["3_para"]!(line, Lines())
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
         
         XCTAssertNotNil(result)
         XCTAssertTrue(result!.count > 0)

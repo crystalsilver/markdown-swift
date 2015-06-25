@@ -9,6 +9,7 @@ import Foundation
 import UChen
 
 class WylieDialect : GruberDialect {
+    static let WYLIE_BLOCK_HANDLER_KEY : String = "0_wylie"
     override init() {
         super.init()
         
@@ -29,7 +30,7 @@ class WylieDialect : GruberDialect {
             }
         }
         
-        self.block["0_wylie"] = {
+        self.block[WylieDialect.WYLIE_BLOCK_HANDLER_KEY] = {
             (line : Line, var next : Lines) -> [AnyObject]? in
             var ret = []
             var re = "^(:::\n*)([\\s\\S\\W\\w\n\r]*?)(\\1)"
