@@ -10,11 +10,12 @@ import Foundation
 
 class GruberDialect : Dialect {
     // Key values determine block handler orders
-    static let ATX_HEADER_HANDLER_KEY : String = "0_atxHeader"
-    static let EXT_HEADER_HANDLER_KEY : String = "1_extHeader"
-    static let HORZ_RULE_HANDLER_KEY : String = "3_horizRule"
-    static let CODE_HANDLER_KEY : String = "4_code"
-    static let PARA_HANDLER_KEY : String = "9_para"
+    static let ATX_HEADER_HANDLER_KEY = "0_atxHeader"
+    static let EXT_HEADER_HANDLER_KEY = "1_extHeader"
+    static let HORZ_RULE_HANDLER_KEY = "3_horizRule"
+    static let CODE_HANDLER_KEY = "4_code"
+    static let PARA_HANDLER_KEY = "9_para"
+    static let __escape__ = "^\\\\[\\\\\\`\\*_{}<>\\[\\]()#\\+.!\\-]"
     
     override init() {
         super.init()
@@ -185,6 +186,34 @@ class GruberDialect : Dialect {
             arr += self.processInline(block._text, patterns: nil)
             return [arr]
         }
+
+        // These characters are interesting elsewhere, so have rules for them so that
+        // chunks of plain text blocks don't include them
+        self.inline["]"] = {
+            (text : String) -> [AnyObject] in
+            return []
+        }
+        
+        self.inline["}"] = {
+            (text : String) -> [AnyObject] in
+            return []
+        }
+        
+        self.inline["\\"] = {
+            (var text : String) -> [AnyObject] in
+            // [ length of input processed, node/children to add... ]
+            // Only esacape: \ ` * _ { } [ ] ( ) # * + - . !
+            if text.isMatch(GruberDialect.__escape__) {
+                let idx1 = advance(text.startIndex, 1)
+                var str : String = String(text.removeAtIndex(idx1))
+                return [2, str]
+            }
+            else {
+                // Not an esacpe
+                return [1, "\\"]
+            }
+        }
+        
         
         self.inline["!["] = {
             (text : String) -> [AnyObject] in

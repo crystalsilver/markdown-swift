@@ -195,4 +195,16 @@ class GruberDialectTests: XCTestCase {
         XCTAssertEqual("code_block", r[0])
         XCTAssertEqual("tell application \"Foo\"\n    beep\nend tell\n    tab", r[1])
     }
+    
+    func testEscapedCharacters() {
+        var chars : [String] = ["\\", "`", "*", "_", "{", "}", "[", "]", "(", ")", "#", "+", "-", ".", "!"]
+        var unescape : (String) -> [AnyObject] = self.gruberDialect.inline["\\"]!
+        for c in chars {
+            var result = unescape("\\"+c)
+            XCTAssertNotNil(result)
+            XCTAssertTrue(result.count > 0)
+            XCTAssertEqual(2, result[0] as! Int)
+            XCTAssertEqual(c, result[1] as! String)
+        }
+    }
 }
