@@ -207,4 +207,23 @@ class GruberDialectTests: XCTestCase {
             XCTAssertEqual(c, result[1] as! String)
         }
     }
+    
+    func testSimpleLinkWithTitle() {
+        var text = "This is [an example](http://example.com/ \"Title\") inline link."
+        var line = Line(text: text, lineNumber: 0, trailing: "\n")
+        
+        var result = self.gruberDialect.block[PARA_BLOCK_HANDLER_KEY]!(line, Lines())
+
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result!.count > 0)
+        var r: AnyObject = result![0]
+        XCTAssertEqual("para", r[0] as! String)
+        
+        var link: [AnyObject] = r[2] as! [AnyObject]
+        XCTAssertEqual("link", link[0] as! String)
+        var attrs : [String:String] = link[1] as! [String:String]
+        XCTAssertEqual("http://example.com/", attrs["href"]!)
+        XCTAssertEqual("Title", attrs["title"]!)
+        XCTAssertEqual("an example", link[2] as! String)
+    }
 }

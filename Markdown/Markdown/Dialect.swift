@@ -147,9 +147,9 @@ class Dialect {
                 
                 // Recurse
                 var res = me.processInline(text.substr(count(md)), patterns: nil)
-                var last = !res.isEmpty ? res.last : nil
+                var last : AnyObject? = !res.isEmpty ? res.last : nil
                 
-                var check =  !me.__states[state_slot]!.isEmpty ? me.__states[state_slot]?.removeAtIndex(0) : nil
+                var check : AnyObject? =  !me.__states[state_slot]!.isEmpty ? me.__states[state_slot]?.removeAtIndex(0) : nil
                 if ( last is CloseTag ) {
                     res.removeLast()
                     var consumed = count(text) - (last as! CloseTag).len_after
@@ -180,5 +180,29 @@ class Dialect {
         }
         
         return block
+    }
+    
+    func inline_until_char(text : String, want : Character) -> [AnyObject] {
+        var consumed = 0
+        var nodes : [AnyObject] = []
+    
+        while true {
+            let c : Character = text[consumed]
+            if c == want {
+                // Found the character we were looking for
+                consumed++
+                return [consumed, nodes]
+            }
+    
+            if consumed >= count(text) {
+                // No closing char found. Abort.
+                return [consumed, [], nodes]
+            }
+    
+            var res = oneElement(text.substr(consumed), patterns: __patterns__)
+            consumed += res[0] as! Int
+            // Add any returned nodes.
+            nodes.extend(res[1...res.count-1])
+        }
     }
 }

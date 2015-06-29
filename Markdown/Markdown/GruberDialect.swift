@@ -216,6 +216,7 @@ class GruberDialect : Dialect {
         
         
         self.inline["!["] = {
+            [unowned self]
             (text : String) -> [AnyObject] in
             
             // Unlike images, alt text is plain text only. no other elements are
@@ -261,6 +262,142 @@ class GruberDialect : Dialect {
             
             // Just consume the '!['
             return [2, "!["]
+        }
+
+        self.inline["["] = {
+            [unowned self]
+            (var text : String) -> [AnyObject] in
+            
+            var open = 1;
+            for c in text {
+                if (c == "[") { open++; }
+                if (c == "]") { open--; }
+                if (open > 3) { return [1, "["] }
+            }
+            
+            var orig = String(text);
+            // Inline content is possible inside `link text`
+            var linkText:String = text.substr(1)
+            var res = self.inline_until_char(linkText, want: "]")
+            
+            // No closing ']' found. Just consume the [
+            var index = res[0] as! Int
+            if index > count(linkText) {
+                var result : [AnyObject] = [index + 1, "["]
+                result += res[2] as! [AnyObject]
+                return result
+            }
+            
+            // empty link
+            if index == 1 { return [ 2, "[]" ] }
+            
+            var consumed = 1 + index
+            var children = res[1] as! [AnyObject]
+            var link : [AnyObject] = []
+            var attrs : [String:String] = [:]
+            
+            // At this point the first [...] has been parsed. See what follows to find
+            // out which kind of link we are (reference or direct url)
+            text = text.substr(consumed)
+            
+            // [link text](/path/to/img.jpg "Optional title")
+            //                 1            2       3         <--- captures
+            // This will capture up to the last paren in the block. We then pull
+            // back based on if there a matching ones in the url
+            //    ([here](/url/(test))
+            // The parens have to be balanced
+            let regEx = "^\\s*\\([ \\t]*([^\"']*)(?:[ \\t]+([\"'])(.*?)\\2)?[ \\t]*\\)"
+            if text.isMatch(regEx) {
+                var m = text.matches(regEx)
+                var url = m[1].replaceByRegEx("\\s+$", replacement: "")
+                consumed += count(m[0])
+                
+                var urlCount = count(url)
+                if (urlCount > 0) {
+                   if url.isMatch("^<") && url.isMatch(">$") {
+                        url = url.substr(1, length: urlCount - 1)
+                    }
+                }
+                
+                // If there is a title we don't have to worry about parens in the url
+                if m.count < 3 {
+                    var open_parens = 1 // One open that isn't in the capture
+                    for var len : Int = 0; len < urlCount; len++ {
+                        var firstChar : String = url![len]
+                        switch firstChar {
+                        case "(":
+                            open_parens++
+                        case ")":
+                            if --open_parens == 0 {
+                                consumed -= urlCount - len
+                                url = url.substr(0, length: len)
+                            }
+                        default:
+                            println(firstChar)
+                        }
+                    }
+                }
+                
+                // Process escapes only
+                url = self.__inline_call__(url, "\\")[0] as! String
+                
+                attrs = ["href": url]
+                if m.count >= 3 {
+                    attrs["title"] = m[3] as String
+                }
+                
+                link = ["link", attrs]
+                link.extend(children)
+                return [consumed, link]
+            }
+            
+            // [Alt text][id]
+            // [Alt text] [id]
+            if text.isMatch("^\\s*\\[(.*?)\\]"){
+                var m = text.matches("^\\s*\\[(.*?)\\]")
+                
+                consumed += count(m[0])
+                
+                // [links][] uses links as its reference
+                var ref = children.reduce("", combine: {$0 + $1.description})
+                if m.count >= 2 {
+                    ref = m[1]
+                }
+                attrs = ["ref" : ref.lowercaseString,  "original" : orig.substr(0, length: consumed)]
+                
+                if children.count > 0 {
+                    link = ["link_ref", attrs]
+                    link.extend(children)
+                    
+                    // We can't check if the reference is known here as it likely wont be
+                    // found till after. Check it in md tree->hmtl tree conversion.
+                    // Store the original so that conversion can revert if the ref isn't found.
+                    return [consumed, link]
+                }
+            }
+            
+            // Another check for references
+            var regExp = "^\\s*\\[(.*?)\\]:\\s*(\\S+)(?:\\s+(?:(['\"])(.*?)\\3|\\((.*?)\\)))?\\n?"
+            if orig.isMatch(regExp) {
+                var m = orig.matches(regExp)
+                var attrs = self.create_attrs()
+                //create_reference(attrs, m);
+                return [count(m[0])]
+            }
+            
+            
+            // [id]
+            // Only if id is plain (no formatting.)
+            if ( children.count == 1 && children[0] is String) {
+                var id = children[0] as! String
+                var normalized = id.lowercaseString.replaceByRegEx("\\s+", replacement: " ")
+                attrs = ["ref" : normalized, "original" : orig.substr(0, length: consumed)]
+                link = ["link_ref", attrs, id]
+                return [consumed, link]
+            }
+            
+            // Just consume the "["
+            return [1, "["]
         }
         
         self.inline["<"] = {
@@ -311,5 +448,39 @@ class GruberDialect : Dialect {
         
         buildBlockOrder()
         buildInlinePatterns()
+    }
+    
+    // A helper function to create attributes
+    func create_attrs() -> [String:AnyObject] {
+        var attrs : [String:AnyObject] = [:]
+        /*if ( !extract_attr( this.tree ) ) {
+            this.tree.splice( 1, 0, {} );
+        }
+    
+        var attrs = extract_attr( this.tree );
+
+        // make a references hash if it doesn't exist
+        if attrs["references"] == nil {
+            attrs["references"] = [:]
+        }*/
+
+        return attrs
+    }
+
+    // Create references for attributes
+    func create_reference(inout attrs : [String:String], inout m : [String]) {
+        /*if m.count >= 3 && m[2].isMatch("^<") && m[2].isMatch(">$") {
+            m[2] = m[2].substr(1, length: count(m[2]) - 1)
+        }
+    
+        var ref = attrs.references[ m[1].toLowerCase() ] = {
+            href: m[2]
+        };
+    
+        if ( m[4] !== undefined ) {
+            ref.title = m[4];
+        } else if ( m[5] !== undefined ) {
+            ref.title = m[5];
+        }*/
     }
 }

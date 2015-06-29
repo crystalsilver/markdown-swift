@@ -91,4 +91,16 @@ extension String {
         var str = self.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
         return count(str) == 0
     }
+    
+    public subscript (i: Int) -> Character {
+        return self[advance(self.startIndex, i)]
+    }
+    
+    public subscript (i: Int) -> String {
+        return String(self[i] as Character)
+    }
+    
+    public subscript (r: Range<Int>) -> String {
+        return substringWithRange(Range(start: advance(startIndex, r.startIndex), end: advance(startIndex, r.endIndex)))
+    }
 }

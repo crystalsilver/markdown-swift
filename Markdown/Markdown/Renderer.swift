@@ -28,7 +28,7 @@ public class Renderer {
     }
     
     func render_tree(var jsonml: [AnyObject]) -> String {
-        var tag = jsonml.removeAtIndex(0)
+        var tag: AnyObject = jsonml.removeAtIndex(0)
         
         if tag is [AnyObject] {
             return render_tree(tag as! [AnyObject])
@@ -45,7 +45,7 @@ public class Renderer {
         }
         
         while jsonml.count > 0 {
-            var node = jsonml.removeAtIndex(0)
+            var node: AnyObject = jsonml.removeAtIndex(0)
             if node is [AnyObject] {
                 content.append(render_tree(node as! [AnyObject]))
             } else {
