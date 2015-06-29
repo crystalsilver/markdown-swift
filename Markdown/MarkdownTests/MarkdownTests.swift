@@ -25,11 +25,11 @@ class MarkdownTests: XCTestCase {
     }
     
     func testProcessBlockCallsWylieDialectBlockHandler() {
-       var md = Markdown(dialectName: "wylie")
-       var text : String = ":::rdorje sangaye jinpa losal rinpoche ddddddderdorje sangaye:::"
-        
+        var md = Markdown(dialectName: "wylie")
+        var text : String = ":::rdorje sangaye jinpa losal rinpoche ddddddderdorje sangaye:::"
+        var lines : Lines = Lines()
         var result = md.processBlock(Line(text: text, lineNumber: 0, trailing: "\n"),
-                                     next: Lines())
+                                     next: &lines)
         
         XCTAssertNotNil(result, "Expected a wylie block")
         XCTAssertFalse(result!.isEmpty, "Expected a wylie block node")

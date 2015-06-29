@@ -28,6 +28,7 @@ public class Renderer {
     }
     
     func render_tree(var jsonml: [AnyObject]) -> String {
+        if jsonml.isEmpty { return "" }
         var tag: AnyObject = jsonml.removeAtIndex(0)
         
         if tag is [AnyObject] {

@@ -10,10 +10,10 @@ import Foundation
 
 class Dialect {
     var inline : Dictionary<String, (String) -> [AnyObject]> = [:]
-    var block : Dictionary<String, (Line,Lines) -> [AnyObject]?> = [:]
+    var block : Dictionary<String, (Line,inout Lines) -> [AnyObject]?> = [:]
     var __patterns__ : String
     var __inline_call__ : (String,String?)->[AnyObject]
-    var __block_call__ : (Line,Lines)->[AnyObject]?
+    var __block_call__ : (Line,inout Lines)->[AnyObject]?
     var __order__ : [String]
     var __states : [String:[AnyObject]] = [:]
     var tree : [AnyObject]
@@ -29,7 +29,7 @@ class Dialect {
             return []
         }
         self.__block_call__ = {
-            (line : Line,var next : Lines)->[AnyObject]? in
+            (line : Line,inout next : Lines)->[AnyObject]? in
             return nil
         }
         self.__states["em_state"] = []
@@ -115,7 +115,7 @@ class Dialect {
         var lines : Lines = Lines(source: source)
         
         while !lines.isEmpty() {
-            var processedLine = self.processBlock(lines.shift(), next : lines)
+            var processedLine = self.processBlock(lines.shift(), next : &lines)
             if processedLine != nil {
                 self.tree.append(processedLine!)
             }
@@ -124,26 +124,40 @@ class Dialect {
         return self.tree
     }
     
-    func processBlock(line : Line?, next : Lines) -> [AnyObject]? {
+    func toTree(source : String, root : [AnyObject]) -> [AnyObject] {
+        var tree = root
+        var lines : Lines = Lines(source: source)
+        
+        while !lines.isEmpty() {
+            var processedLine = self.processBlock(lines.shift(), next : &lines)
+            if processedLine != nil {
+                tree.append(processedLine!)
+            }
+        }
+        
+        return tree
+    }
+    
+    func processBlock(line : Line?, inout next : Lines) -> [AnyObject]? {
         if line == nil {
             return []
         } else {
             var dialect = self
             
             if dialect.block["__call__"] != nil {
-                return dialect.block["__call__"]!(line!, next)
+                return dialect.block["__call__"]!(line!, &next)
             } else {
                 var blockHandlers = dialect.block
                 var ord = dialect.__order__
                 for var i = 0; i < ord.count; i++ {
-                    var res = blockHandlers[ord[i]]!(line!, next)
+                    var res = blockHandlers[ord[i]]!(line!, &next)
                     if res != nil && res!.count > 0 {
                         var r : [AnyObject] = res!
                         var node : [AnyObject]? = r[0] as? [AnyObject]
                         if (!r.isEmpty && node == nil) {
                             println(ord[i] + " didn't return proper JsonML")
                         } else if node != nil &&
-                            node!.isEmpty &&
+                            !(node!.isEmpty) &&
                             node![0] as? String == nil {
                                 println(ord[i] + " didn't return proper JsonML")
                         }

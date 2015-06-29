@@ -38,11 +38,11 @@ public class Markdown {
         return self.dialect.toTree(source)
     }
     
-    func processBlock(line : Line?, next : Lines) -> [AnyObject]? {
+    func processBlock(line : Line?, inout next : Lines) -> [AnyObject]? {
         if line == nil {
             return []
         } else {
-            return self.dialect.processBlock(line, next: next)
+            return self.dialect.processBlock(line, next: &next)
         }
     }
     

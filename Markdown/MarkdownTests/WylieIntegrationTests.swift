@@ -31,6 +31,10 @@ class WylieIntegrationTests : XCTestCase {
     func testWylie() {
         runTests("wylie")
     }
+    
+    func testHorizontalRules() {
+        runTests("horizontal_rules")
+    }
 
     func runTests(subDir:String) -> () {
         let tests : [String:String] = getFilenames(subDir)
@@ -41,25 +45,22 @@ class WylieIntegrationTests : XCTestCase {
             let markdown = readFile(mdInputFile, type: "text")
             if !markdown.isBlank() {
                 let expected = readFile(mdOutputFile, type: "xml")
+                
+            println("-------------------------------------------------------------------------------")
+                println("    Running " + testName)
                 let md : Markdown = Markdown()
                 let result : [AnyObject] = md.parse(markdown)
                 if !expected.isBlank() {
-                    println("-------------------------------------------------------------------------------")
-                    println("    Running XML " + testName);
                     println("")
                     let xml = XmlRenderer().toXML(result, includeRoot: true)
                     XCTAssertEqual(expected, xml, testName + " test failed")
-                    println("-------------------------------------------------------------------------------")
                     println("")
                 }
                 let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
                 if !expectedHTML.isBlank() {
-                    println("-------------------------------------------------------------------------------")
-                    println("    Running HTML " + testName);
                     println("")
                     let html = HtmlRenderer().toHTML(result)
                     XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
-                    println("-------------------------------------------------------------------------------")
                     println("")
                 }
             }

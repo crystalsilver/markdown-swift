@@ -31,7 +31,7 @@ class WylieDialect : GruberDialect {
         }
         
         self.block[WylieDialect.WYLIE_BLOCK_HANDLER_KEY] = {
-            (line : Line, var next : Lines) -> [AnyObject]? in
+            (line : Line, inout next : Lines) -> [AnyObject]? in
             var ret = []
             var re = "^(:::\n*)([\\s\\S\\W\\w\n\r]*?)(\\1)"
             var reStartBlock = "^:::\n*"

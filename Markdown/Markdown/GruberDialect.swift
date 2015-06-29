@@ -51,7 +51,7 @@ class GruberDialect : Dialect {
         }
 
         self.block[GruberDialect.ATX_HEADER_HANDLER_KEY] = {
-            (block : Line, var next : Lines) -> [AnyObject]? in
+            (block : Line, inout next : Lines) -> [AnyObject]? in
             var regEx = "^(#{1,6})\\s*(.*?)\\s*#*\\s*(?:\n|$)"
             
             if !block._text.isMatch(regEx) {
@@ -69,7 +69,7 @@ class GruberDialect : Dialect {
                 }
                 
                 if (count(matches[0]) < count(block._text)) {
-                    var l = Line(text: block._text.substr(0,length: count(matches[0])), lineNumber: block._lineNumber + 2, trailing:block._trailing)
+                    var l = Line(text: block._text.substr(count(matches[0])), lineNumber: block._lineNumber + 2, trailing:block._trailing)
                     next.unshift(l)
                 }
                 
@@ -77,7 +77,7 @@ class GruberDialect : Dialect {
             }
         }
         self.block[GruberDialect.EXT_HEADER_HANDLER_KEY] = {
-            (block : Line, var next : Lines) -> [AnyObject]? in
+            (block : Line, inout next : Lines) -> [AnyObject]? in
             var regEx = "^(.*)\n([-=])\\2\\2+(?:\n|$)"
 
             if !block._text.isMatch(regEx) {
@@ -103,7 +103,7 @@ class GruberDialect : Dialect {
         }
         
         self.block[GruberDialect.HORZ_RULE_HANDLER_KEY] = {
-            (block : Line, var next : Lines) -> [AnyObject]? in
+            (block : Line, inout next : Lines) -> [AnyObject]? in
             
             let regEx = "^(?:([\\s\\S]*?)\n)?[ \t]*([-_*])(?:[ \t]*\\2){2,}[ \t]*(?:\n([\\s\\S]*))?$"
             
@@ -117,20 +117,25 @@ class GruberDialect : Dialect {
             
             // if there's a leading abutting block, process it
             if matches.count >= 2 {
-                var contained = Line(text: matches[1], lineNumber: block._lineNumber, trailing: "")
-                //TODO jsonml.insert(self.toTree( contained, [] ) , atIndex: 0)
+                var contained = matches[1]
+                if count(contained) > 0 {
+                    var nodes = super.toTree(contained, root: [] )
+                    jsonml = [nodes,["hr"]]
+                }
             }
             
             // if there's a trailing abutting block, stick it into next
             if matches.count >= 4 {
-                next.unshift(Line(text: matches[3], lineNumber: block._lineNumber + 1, trailing: block._trailing))
+                if count(matches[3]) > 0 {
+                    next.unshift(Line(text: matches[3], lineNumber: block._lineNumber + 1, trailing: block._trailing))
+                }
             }
             
             return jsonml
         }
 
         self.block[GruberDialect.CODE_HANDLER_KEY] = {
-            (block : Line, var next : Lines) -> [AnyObject]? in
+            (block : Line, inout next : Lines) -> [AnyObject]? in
             // |    Foo
             // |bar
             // should be a code block followed by a paragraph. Fun
@@ -181,7 +186,7 @@ class GruberDialect : Dialect {
         }
         
         self.block[GruberDialect.PARA_HANDLER_KEY] = {
-            (block : Line, var next : Lines) -> [AnyObject]? in
+            (block : Line, inout next : Lines) -> [AnyObject]? in
             var arr : [AnyObject] = ["para"]
             arr += self.processInline(block._text, patterns: nil)
             return [arr]

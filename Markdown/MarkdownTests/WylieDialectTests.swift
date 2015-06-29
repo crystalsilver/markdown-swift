@@ -40,18 +40,15 @@ class WylieDialectTests: XCTestCase {
     }
     
     func testBlockReturnsNilWhenNoMatch() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
-        
-        var result = f(Line(text: "this shouldn't match at all",lineNumber:0),Lines())
+        var result = runBlockHandler(WYLIE_BLOCK_HANDLER_KEY, line: Line(text: "this shouldn't match at all",lineNumber:0))
         
         XCTAssertNil(result, "Should return nil when line text does not match")
     }
 
     func testBlock() {
         var text : String = ":::rdorje sangaye jinpa losal rinpoche ddddddderdorje sangaye:::"
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
         
-        var result : [AnyObject]? = f(Line(text: text,lineNumber:0),Lines())
+        var result : [AnyObject]? = runBlockHandler(WYLIE_BLOCK_HANDLER_KEY, line: Line(text: text,lineNumber:0))
         
         var jsonML : [AnyObject] = result![0] as! [AnyObject]
         XCTAssertEqual("uchen_block", jsonML[0] as! String, "Expecting uchen JsonML block")
@@ -65,13 +62,13 @@ class WylieDialectTests: XCTestCase {
     }
     
     func testTrailingBlock() {
-        var f : (Line,Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
+        var f : (Line,inout Lines) -> [AnyObject]? = self.wylieDialect.block[WYLIE_BLOCK_HANDLER_KEY]!
         var firstBlockLine = Line(text: ":::rdorje", lineNumber:1)
         var nextBlockLines = Lines()
         nextBlockLines._lines.append(Line(text: "sanggye",   lineNumber:2))
         nextBlockLines._lines.append(Line(text: "rdorje\n:::",lineNumber:3))
         
-        var result : [AnyObject]? = f(firstBlockLine, nextBlockLines)
+        var result : [AnyObject]? = f(firstBlockLine, &nextBlockLines)
         
         var jsonML : [AnyObject] = result![0] as! [AnyObject]
         XCTAssertEqual("uchen_block", jsonML[0] as! String, "Expecting uchen JsonML block")
@@ -82,5 +79,10 @@ class WylieDialectTests: XCTestCase {
         XCTAssertEqual("uchen", attr["class"]!, "Class attribute missing?")
         XCTAssertNotNil(attr["wylie"], "Wylie attribute missing?")
         XCTAssertEqual("rdorjesanggyerdorje", attr["wylie"]!, "Wylie attribute missing?")
+    }
+    
+    func runBlockHandler(name : String, line: Line) -> [AnyObject]? {
+        var lines : Lines = Lines()
+        return self.wylieDialect.block[name]!(line, &lines)
     }
 }
