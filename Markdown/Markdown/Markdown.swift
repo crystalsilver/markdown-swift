@@ -35,53 +35,14 @@ public class Markdown {
     }
     
     public func parse(source : String) -> [AnyObject] {
-        return self.toTree(source)
-    }
-    
-    func toTree(source : String) -> [AnyObject] {
-        var tree : [AnyObject] = ["markdown"]
-        var lines : Lines = Lines(source: source)
-            
-        while !lines.isEmpty() {
-            var processedLine = self.processBlock(lines.shift(), next : lines)
-            if processedLine != nil {
-                tree.append(processedLine!)
-            }
-        }
-        
-        return tree
+        return self.dialect.toTree(source)
     }
     
     func processBlock(line : Line?, next : Lines) -> [AnyObject]? {
         if line == nil {
             return []
         } else {
-            var dialect = self.dialect
-            
-            if dialect.block["__call__"] != nil {
-                return dialect.block["__call__"]!(line!, next)
-            } else {
-                var blockHandlers = dialect.block
-                var ord = dialect.__order__
-                for var i = 0; i < ord.count; i++ {
-                    var res = blockHandlers[ord[i]]!(line!, next)
-                    if res != nil && res!.count > 0 {
-                        var r : [AnyObject] = res!
-                        var node : [AnyObject]? = r[0] as? [AnyObject]
-                        if (!r.isEmpty && node == nil) {
-                            println(ord[i] + " didn't return proper JsonML")
-                        } else if node != nil &&
-                                  node!.isEmpty &&
-                                  node![0] as? String == nil {
-                            println(ord[i] + " didn't return proper JsonML")
-                        }
-                        
-                        return res
-                    }
-                }
-            }
-            
-            return nil
+            return self.dialect.processBlock(line, next: next)
         }
     }
     

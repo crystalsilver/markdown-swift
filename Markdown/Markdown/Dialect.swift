@@ -16,6 +16,8 @@ class Dialect {
     var __block_call__ : (Line,Lines)->[AnyObject]?
     var __order__ : [String]
     var __states : [String:[AnyObject]] = [:]
+    var tree : [AnyObject]
+    
     // A robust regexp for matching URLs. Thanks: https://gist.github.com/dperini/729294
     let URL_REG_EX : String = "(?:(?:https?|ftp):\\/\\/)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\u{00a1}-\u{ffff0}-9]-*)*[a-z\u{00a1}-\u{ffff0}-9]+)(?:\\.(?:[a-z\u{00a1}-\\u{ffff0}-9]+-?)*[a-z\u{00a1}-\u{ffff0}-9]+)*(?:\\.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::\\d{2,5})?(?:\\/[^\\s]*)?"
 
@@ -32,6 +34,7 @@ class Dialect {
         }
         self.__states["em_state"] = []
         self.__states["strong_state"] = []
+        self.tree = ["markdown"]
     }
     
     func buildBlockOrder() {
@@ -105,6 +108,53 @@ class Dialect {
         res = !res.isEmpty ? res : [count(matches[2]), matches[2]]
 
         return res
+    }
+    
+    func toTree(source : String) -> [AnyObject] {
+        self.tree = ["markdown"]
+        var lines : Lines = Lines(source: source)
+        
+        while !lines.isEmpty() {
+            var processedLine = self.processBlock(lines.shift(), next : lines)
+            if processedLine != nil {
+                self.tree.append(processedLine!)
+            }
+        }
+        
+        return self.tree
+    }
+    
+    func processBlock(line : Line?, next : Lines) -> [AnyObject]? {
+        if line == nil {
+            return []
+        } else {
+            var dialect = self
+            
+            if dialect.block["__call__"] != nil {
+                return dialect.block["__call__"]!(line!, next)
+            } else {
+                var blockHandlers = dialect.block
+                var ord = dialect.__order__
+                for var i = 0; i < ord.count; i++ {
+                    var res = blockHandlers[ord[i]]!(line!, next)
+                    if res != nil && res!.count > 0 {
+                        var r : [AnyObject] = res!
+                        var node : [AnyObject]? = r[0] as? [AnyObject]
+                        if (!r.isEmpty && node == nil) {
+                            println(ord[i] + " didn't return proper JsonML")
+                        } else if node != nil &&
+                            node!.isEmpty &&
+                            node![0] as? String == nil {
+                                println(ord[i] + " didn't return proper JsonML")
+                        }
+                        
+                        return res
+                    }
+                }
+            }
+            
+            return nil
+        }
     }
     
     func processInline(line : String, patterns: String?)->[AnyObject] {
