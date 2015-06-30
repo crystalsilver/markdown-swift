@@ -49,6 +49,8 @@ public class Renderer {
             var node: AnyObject = jsonml.removeAtIndex(0)
             if node is [AnyObject] {
                 content.append(render_tree(node as! [AnyObject]))
+            } else if node is [String:AnyObject] {
+                println("Render warning: " + node.description)
             } else {
                 content.append(render_tree(node as! String))
             }

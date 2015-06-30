@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<markdown><para>Link with <link_ref ref="id" original="[missing][id] ">missing</link_ref> reference</para><para>Link with <link_ref original="[empty][] ">empty</link_ref> reference</para><para>Link with <link_ref ref="inferred" original="[inferred] ">inferred</link_ref> reference</para><para></para></markdown>

@@ -51,8 +51,12 @@ extension String {
         if length > 0 {
             let ix1 = advance(self.startIndex, startIndex)
             let ix2 = advance(ix1,length)
-            let r = ix1...ix2
-            return self[r]
+            if ix2 < self.endIndex {
+                let r = ix1...ix2
+                return self[r]
+            } else {
+                return ""
+            }
         } else {
             return self
         }
@@ -93,7 +97,12 @@ extension String {
     }
     
     public subscript (i: Int) -> Character {
-        return self[advance(self.startIndex, i)]
+        var idx : String.Index = advance(self.startIndex, i)
+        if idx < self.endIndex {
+            return self[idx]
+        } else {
+            return Character(" ")
+        }
     }
     
     public subscript (i: Int) -> String {

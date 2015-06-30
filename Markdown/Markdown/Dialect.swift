@@ -266,7 +266,22 @@ class Dialect {
             var res = oneElement(text.substr(consumed), patterns: __patterns__)
             consumed += res[0] as! Int
             // Add any returned nodes.
-            nodes.extend(res[1...res.count-1])
+            if !((res.count - 1) < 1) {
+                nodes.extend(res[1...res.count-1])
+            } else {
+                println("Warning: " + res.description)
+            }
         }
+    }
+    
+    func extract_attr(jsonml : [AnyObject]) -> [String:AnyObject] {
+        var result : [String:AnyObject] = [:]
+        if jsonml.count > 1 {
+            let dict = jsonml[1] as? [String:AnyObject]
+            if dict != nil {
+                result = dict!
+            }
+        }
+        return result
     }
 }

@@ -384,9 +384,9 @@ class GruberDialect : Dialect {
             // Another check for references
             var regExp = "^\\s*\\[(.*?)\\]:\\s*(\\S+)(?:\\s+(?:(['\"])(.*?)\\3|\\((.*?)\\)))?\\n?"
             if orig.isMatch(regExp) {
-                var m = orig.matches(regExp)
-                var attrs = self.create_attrs()
-                //create_reference(attrs, m);
+                var m : [String] = orig.matches(regExp)
+                var attrs : [String:AnyObject] = self.create_attrs()
+                self.create_reference(&attrs, m: &m);
                 return [count(m[0])]
             }
             
@@ -457,35 +457,34 @@ class GruberDialect : Dialect {
     
     // A helper function to create attributes
     func create_attrs() -> [String:AnyObject] {
-        var attrs : [String:AnyObject] = [:]
-        /*if ( !extract_attr( this.tree ) ) {
-            this.tree.splice( 1, 0, {} );
+        var attrs : [String:AnyObject] = extract_attr(self.tree)
+        if attrs.isEmpty {
+            self.tree.insert(attrs, atIndex:1)
         }
-    
-        var attrs = extract_attr( this.tree );
 
         // make a references hash if it doesn't exist
         if attrs["references"] == nil {
-            attrs["references"] = [:]
-        }*/
+            attrs["references"] = [String:AnyObject]()
+        }
 
         return attrs
     }
 
     // Create references for attributes
-    func create_reference(inout attrs : [String:String], inout m : [String]) {
-        /*if m.count >= 3 && m[2].isMatch("^<") && m[2].isMatch(">$") {
+    func create_reference(inout attrs : [String:AnyObject],
+                          inout m : [String]) {
+        if m.count >= 3 && m[2].isMatch("^<") && m[2].isMatch(">$") {
             m[2] = m[2].substr(1, length: count(m[2]) - 1)
         }
+
+        var ref = ["href": m[2]]
+        var references : [String:AnyObject] = attrs["references"] as! [String:AnyObject]
+        references[m[1].lowercaseString] = ref
     
-        var ref = attrs.references[ m[1].toLowerCase() ] = {
-            href: m[2]
-        };
-    
-        if ( m[4] !== undefined ) {
-            ref.title = m[4];
-        } else if ( m[5] !== undefined ) {
-            ref.title = m[5];
-        }*/
+        if m.count == 5 && count(m[4]) > 0 {
+            ref["title"] = m[4]
+        } else if m.count == 6 && count(m[5]) > 0  {
+            ref["title"] = m[5]
+        }
     }
 }

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<markdown><para>Lorem ipsum (<link href="http://www.lipsum.com/)">lorem ipsum</link> dolar sit amut</para><para>(<link href="/url()((test)))">Inline link</link></para><para></para></markdown>

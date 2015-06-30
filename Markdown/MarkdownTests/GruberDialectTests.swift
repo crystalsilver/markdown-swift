@@ -48,6 +48,13 @@ class GruberDialectTests: XCTestCase {
         XCTAssertNotNil(result)
     }
     
+    func testBrokenLinkEscaped() {
+        var result = self.gruberDialect.toTree("[\\]")
+        
+        XCTAssertNotNil(result)
+    }
+    
+    
     func testSimpleExtLevel1HeaderBlock() {
         var line = Line(text: "This is a level 1 heading\n======================", lineNumber: 0, trailing: "\n\n")
         

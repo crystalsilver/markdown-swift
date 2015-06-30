@@ -21,22 +21,26 @@ class WylieIntegrationTests : XCTestCase {
     }
 
     func testHeaders() {
-        runTests("headers")
+        runTests("headers", runXML: true, runHTML: true)
     }
 
     func testCode() {
-        runTests("code")
+        runTests("code", runXML: true, runHTML: true)
     }
     
     func testWylie() {
-        runTests("wylie")
+        runTests("wylie", runXML: true, runHTML: true)
     }
     
     func testHorizontalRules() {
-        runTests("horizontal_rules")
+        runTests("horizontal_rules", runXML: true, runHTML: true)
+    }
+    
+    func testLinks() {
+        runTests("links", runXML: true, runHTML: true)
     }
 
-    func runTests(subDir:String) -> () {
+    func runTests(subDir : String, runXML : Bool, runHTML: Bool) -> () {
         let tests : [String:String] = getFilenames(subDir)
         for (test,file) in tests {
             let testName = test
@@ -50,14 +54,15 @@ class WylieIntegrationTests : XCTestCase {
                 println("    Running " + testName)
                 let md : Markdown = Markdown()
                 let result : [AnyObject] = md.parse(markdown)
-                if !expected.isBlank() {
+                XCTAssertNotNil(result, testName + " failed to yield a result.")
+                if runXML && !expected.isBlank() {
                     println("")
                     let xml = XmlRenderer().toXML(result, includeRoot: true)
                     XCTAssertEqual(expected, xml, testName + " test failed")
                     println("")
                 }
                 let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
-                if !expectedHTML.isBlank() {
+                if runHTML && !expectedHTML.isBlank() {
                     println("")
                     let html = HtmlRenderer().toHTML(result)
                     XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
