@@ -17,6 +17,7 @@ class GruberDialect : Dialect {
     static let CODE_HANDLER_KEY = "4_code"
     static let BLOCK_QUOTE_HANDLER_KEY = "5_block_quote"
     static let DEF_LIST_HANDLER_KEY = "6_def_list"
+    static let LIST_HANDLER_KEY = "7_list"
     static let PARA_HANDLER_KEY = "9_para"
     static let __escape__ = "^\\\\[\\\\\\`\\*_{}<>\\[\\]()#\\+.!\\-]"
     
@@ -195,6 +196,295 @@ class GruberDialect : Dialect {
             return [arr]
         }
 
+        /*self.block[GruberDialect.LIST_HANDLER_KEY] = {
+            [unowned self]
+            (var block : Line, inout next : Lines) -> [AnyObject]? in
+            
+            var any_list = "[*+-]|\\d+\\."
+            var bullet_list = "[*+-]"
+            // Capture leading indent as it matters for determining nested lists.
+            var is_list_re = "^( {0,3})(" + any_list + ")[ \t]+"
+            var indent_re = "(?: {0,3}\\t| {4})"
+            
+            // TODO: Cache this regexp for certain depths.
+            // Create a regexp suitable for matching an li for a given stack depth
+            func regex_for_depth(depth : Int) -> String {
+                // m[1] = indent, m[2] = list_type m[3] = cont
+                return "(?:^(\(indent_re){0,\(depth)} {0,3})(\(any_list))\\s+)|(^\(indent_re){0,\(depth-1)}[ ]{0,4})"
+            }
+            
+            func expand_tab(input : String) -> String {
+                return input.replaceByRegEx(" {0,3}\t", replacement: "    " )
+            }
+            
+            // Add inline content `inline` to `li`. inline comes from processInline
+            // so is an array of content
+            func add(inout li:[AnyObject], loose : Bool, inout inline : [AnyObject], nl : String?) {
+                if loose {
+                    var nextLi : [AnyObject] = ["para"]
+                    nextLi.extend(inline)
+                    li.append(nextLi)
+                    return
+                }
+                
+                if li.count < 0 { return }
+                
+                // Hmmm, should this be any block level element or just paras?
+                var lastItem : AnyObject = li[li.count-1]
+                var add_to : [AnyObject]
+                if (lastItem is [AnyObject]) && (lastItem[0] === "para") {
+                    add_to = lastItem as! [AnyObject]
+                } else {
+                    add_to = li
+                }
+                
+                // If there is already some content in this list, add the new line in
+                if nl != nil && (li.count > 1) {
+                    inline.insert(nl!, atIndex: 0)
+                }
+                
+                for var i = 0; i < inline.count; i++ {
+                    var what: AnyObject = inline[i]
+                    var is_str = what is String
+                    var endItem: AnyObject = add_to[add_to.count-1]
+                    if ( is_str && add_to.count > 1 && endItem is String) {
+                        add_to[add_to.count-1] = (endItem as! String)  + (what as! String)
+                    }
+                    else {
+                        add_to.append(what)
+                    }
+                }
+            }
+            
+            // contained means have an indent greater than the current one. On
+            // *every* line in the block
+            func get_contained_blocks(depth : Int, inout blocks : Lines) -> Lines {
+                var re = "^(\(indent_re){\(depth)}.*?\\n?)*$"
+                var replace = "^\(indent_re){\(depth)}"
+                var ret = Lines()
+                
+                while !blocks.isEmpty() {
+                    if blocks.line(0)._text.isMatch(re) {
+                        var b : Line = blocks.shift()!
+                        // Now remove that indent
+                        var x = b._text.replaceByRegEx(replace, replacement: "")
+                        
+                        ret.unshift(Line(text: x, lineNumber: b._lineNumber, trailing: b._trailing))
+                    }
+                    else {
+                        break
+                    }
+                }
+                return ret
+            }
+            
+            // passed to stack.forEach to turn list items up the stack into paras
+            func paragraphify(inout s : [String:AnyObject], i : Int, stack : [AnyObject]) {
+                /*var list = s["list"] as! [AnyObject]
+                var last_li = list[list.count-1]
+                var item : [AnyObject]? = last_li[1] as? [AnyObject]
+                if (item != nil) {
+                    var s = item[0] as? String
+                    if (s === "para") {
+                        return
+                    }
+                }
+                
+                todo if ( i + 1 === stack.count ) {
+                    // Last stack frame
+                    // Keep the same array, but replace the contents
+                    last_li.push( ["para"].concat( last_li.splice(1, last_li.length - 1) ) );
+                }
+                else {
+                    var sublist = last_li.pop();
+                    last_li.push( ["para"].concat( last_li.splice(1, last_li.length - 1) ), sublist );
+                }*/
+            }
+            
+            func make_list(matches : [String], inout s : [AnyObject]) -> [AnyObject] {
+                var list = matches[2].isMatch(bullet_list) ? ["bulletlist"] : ["numberlist"]
+                
+                s.append(["list" : list, "indent": matches[1]])
+                
+                return list
+            }
+            
+            if !block._text.isMatch(is_list_re) {
+                return []
+            }
+            
+            var matches = block._text.matches(is_list_re)
+            var stack : [AnyObject] = [] // Stack of lists for nesting.
+            var list = make_list(matches, &stack)
+            var last_li : [AnyObject] = []
+            var loose = false
+            var ret : [AnyObject] = [list]
+            var i:Int
+            
+            // Loop to search over block looking for inner block elements and loose lists
+            loose_search:
+                while true {
+                    // Split into lines preserving new lines at end of line
+                    var listlines = block._text.split("\n")
+                    listlines.map({$0 + "\n"})
+                    
+                    // We have to grab all lines for a li and call processInline on them
+                    // once as there are some inline things that can span lines.
+                    var li_accumulate = ""
+                    var nl = ""
+                    
+                    // Loop over the lines in this block looking for tight lists.
+                    tight_search:
+                        for var line_no = 0; line_no < listlines.count; line_no++ {
+                            nl = ""
+                            var l = listlines[line_no]
+                            if l.isMatch("^\n") {
+                                nl = "\n"
+                                l = ""
+                            }
+                            
+                            // TODO: really should cache this
+                            var line_re = regex_for_depth(stack.count)
+                            
+                            matches = l.matches(line_re)
+                            //print( "line:", uneval(l), "\nline match:", uneval(m) );
+                            
+                            // We have a list item
+                            if matches[1] != ""  {
+                                // Process the previous list item, if any
+                                if count(li_accumulate) > 0 {
+                                    //todo add( last_li, loose, this.processInline( li_accumulate ), nl ); **************************************
+                                    // Loose mode will have been dealt with. Reset it
+                                    loose = false
+                                    li_accumulate = ""
+                                }
+                                
+                                matches[1] = expand_tab(matches[1])
+                                var d = Double(count(matches[1])/4)
+                                var wanted_depth = Int(floor(d))+1
+                                println("want:\(wanted_depth) stack:\(stack.count)")
+                                if wanted_depth > stack.count {
+                                    // Deep enough for a nested list outright
+                                    //print ( "new nested list" );
+                                    list = make_list(matches, &stack)
+                                    last_li.append(list)
+                                    //last_li = list[1] = [ "listitem" ];***************************************************************
+                                }
+                                else {
+                                    // We aren't deep enough to be strictly a new level. This is
+                                    // where Md.pl goes nuts. If the indent matches a level in the
+                                    // stack, put it there, else put it one deeper then the
+                                    // wanted_depth deserves.
+                                    var found = false
+                                    for ( i = 0; i < stack.count; i++ ) {
+                                        //if ( stack[ i ]["indent"] != matches[1] ) {
+                                        //    continue
+                                        //}
+                                        
+                                        //list = stack[i]["list"]
+                                        //stack.splice( i+1, stack.length - (i+1) );****************************************************
+                                        found = true
+                                        break
+                                    }
+                                    
+                                    if (!found) {
+                                        //print("not found. l:", uneval(l));
+                                        wanted_depth++;
+                                        if wanted_depth <= stack.count {
+                                            //stack.splice(wanted_depth, stack.count - wanted_depth)
+                                            //print("Desired depth now", wanted_depth, "stack:", stack.length);
+                                            //list = stack[wanted_depth-1]["list"]
+                                            //print("list:", uneval(list) );
+                                        }
+                                        else {
+                                            //print ("made new stack for messy indent");
+                                            list = make_list(matches, &stack)
+                                            last_li.append(list)
+                                        }
+                                    }
+                                    
+                                    //print( uneval(list), "last", list === stack[stack.length-1].list );
+                                    last_li = [ "listitem" ]
+                                    list.append(last_li)
+                                } // end depth of shenegains
+                                nl = "";
+                            }
+                            
+                            // Add content
+                            if count(l) > count(matches[0]) {
+                                li_accumulate += nl + l.substr(count(matches[0]))
+                            }
+                    } // tight_search
+                    
+                    if count(li_accumulate) > 0{
+                        var emptyLines = Lines()
+                        var contents = self.processBlock(Line(text:li_accumulate, lineNumber:0, trailing:""), next: &emptyLines)
+                        
+                        if contents != nil {
+                            //firstBlock = contents![0]
+                            //firstBlock.removeAtIndex(0)
+                            var arr : [AnyObject] = [0,1]
+                            //arr.extend(firstBlock)
+                            //contents.splice.apply(contents, [0, 1].concat(firstBlock));*****************************************
+                            //add( last_li, loose, contents, nl );
+                            
+                            // Let's not creating a trailing \n after content in the li
+                            //if last_li[last_li.count-1] === "\n" {
+                            //    last_li.removeLast()
+                            //}
+                            
+                            // Loose mode will have been dealt with. Reset it
+                            loose = false
+                            li_accumulate = ""
+                        }
+                    }
+                    
+                    // Look at the next block - we might have a loose list. Or an extra
+                    // paragraph for the current li
+                    var contained = get_contained_blocks(stack.count, &next)
+                    
+                    // Deal with code blocks or properly nested lists
+                    if !contained.isEmpty() {
+                        // Make sure all listitems up the stack are paragraphs
+                        var j : Int = 0
+                        for item in stack {
+                            var s : [String:AnyObject] = item as! [String:AnyObject]
+                            paragraphify(&s, j++, stack)
+                        }
+                        
+                        last_li.append(self.toTree(contained.text(), root:[]))
+                    }
+                    
+                    var next_block = ""
+                    if !next.isEmpty() {
+                        next_block = next.line(0)._text
+                    }
+                    if next_block.isMatch(is_list_re) || next_block.isMatch("^ ") {
+                        block = next.shift()!
+                        
+                        // Check for an HR following a list: features/lists/hr_abutting
+                        /*var hr = this.dialect.block.horizRule.call( this, block, next );***************************************
+                        
+                        if ( hr ) {
+                            ret.push.apply(ret, hr);
+                            break;
+                        }
+                        
+                        // Add paragraphs if the indentation level stays the same
+                        if (stack[stack.length-1].indent === block.match("^\s*")[0]) {
+                            forEach( stack, paragraphify, this);
+                        }*/
+                        
+                        loose = true;
+                        continue loose_search;
+                    }
+                    
+                    break
+                } // loose_search
+            
+            return ret
+        }*/
+        
         self.block[GruberDialect.DEF_LIST_HANDLER_KEY] = {
             [unowned self]
             (var block : Line, inout next : Lines) -> [AnyObject]? in

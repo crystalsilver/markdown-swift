@@ -86,4 +86,8 @@ struct Lines : Printable {
         self._lines = elements + self._lines
         return self._lines.count
     }
+    
+    func text() -> String {
+        return self._lines.reduce("",combine: {$0 + $1._text + $1._trailing})
+    }
 }
