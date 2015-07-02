@@ -143,24 +143,26 @@ public class HtmlRenderer: Renderer {
             case "img_ref":
                 jsonml[0] = "img"
                 if attrs != nil {
-                    var attributes = attrs!
-                    // grab this ref and clean up the attribute node
-                    //var ref = refs[attributes["ref"]]
-        
-                    /* if the reference exists, make the link
-                    if ref != nil {
-                        attrs.removeValueForKey("ref")
-        
-                        // add in the href and title, if present
-                        attrs.src = ref.href;
-                        if ( ref.title )
-                            attrs.title = ref.title;
-        
-                        // get rid of the unneeded original text
-                        delete attrs.original;
-                    } else {
-                        return attrs.original
-                    }*/
+                    var attributes : [String:AnyObject] = attrs!
+                    var key = attributes["ref"] as? String
+                    if key != nil {
+                        // grab this ref and clean up the attribute node
+                        var ref = refs[key!]
+                        
+                        // if the reference exists, make the link
+                        if ref != nil {
+                            attrs!.removeValueForKey("ref")
+                            // add in the href if present
+                            attrs!["href"] = ref!.href
+                            
+                            // get rid of the unneeded original text
+                            attrs!.removeValueForKey("original")
+                            
+                            jsonml[1] = attrs!
+                        } else {
+                            return (attributes.indexForKey("original") != nil) ? [attributes["original"]!] : []
+                        }
+                    }
                 }
             default:
                 println("convert_to_html encountered unsupported element " + nodeName)

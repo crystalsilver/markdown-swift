@@ -259,6 +259,15 @@ class GruberDialectTests: XCTestCase {
         println(HtmlRenderer().toHTML(result))
     }
     
+    func testImageReferenceLink() {
+        var text = "![Alt text] [img]\n\n[img]: /path/to/img.jpg"
+        
+        var result = self.gruberDialect.toTree(text)
+        
+        println(result.description)
+        println(HtmlRenderer().toHTML(result))
+    }
+    
     func runBlockHandler(name : String, line: Line) -> [AnyObject]? {
         var lines : Lines = Lines()
         return self.gruberDialect.block[name]!(line, &lines)
