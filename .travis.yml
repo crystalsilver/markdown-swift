@@ -1,3 +1,4 @@
 language: swift
 xcode_project: Markdown.xcodeproj # path to your xcodeproj folder
-xcode_scheme: MarkdownTests
+xcode_scheme: Markdown
+xcode_sdk: iphonesimulator6.0
