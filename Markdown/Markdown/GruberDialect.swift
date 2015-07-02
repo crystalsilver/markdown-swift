@@ -15,6 +15,8 @@ class GruberDialect : Dialect {
     static let EXT_HEADER_HANDLER_KEY = "1_extHeader"
     static let HORZ_RULE_HANDLER_KEY = "3_horizRule"
     static let CODE_HANDLER_KEY = "4_code"
+    static let BLOCK_QUOTE_HANDLER_KEY = "5_block_quote"
+    static let DEF_LIST_HANDLER_KEY = "6_def_list"
     static let PARA_HANDLER_KEY = "9_para"
     static let __escape__ = "^\\\\[\\\\\\`\\*_{}<>\\[\\]()#\\+.!\\-]"
     
@@ -193,6 +195,98 @@ class GruberDialect : Dialect {
             return [arr]
         }
 
+        self.block[GruberDialect.DEF_LIST_HANDLER_KEY] = {
+            [unowned self]
+            (var block : Line, inout next : Lines) -> [AnyObject]? in
+            
+            var regEx = "^\\s*\\[([^\\[\\]]+)\\]:\\s*(\\S+)(?:\\s+(?:(['\"])(.*)\\3|\\((.*?)\\)))?\n?"
+            
+            // interesting matches are [ , ref_id, url, , title, title ]
+            if !block._text.isMatch(regEx) {
+                return []
+            }
+            
+            var b = self.loop_re_over_block(regEx, block: block._text) {
+                
+                (matches: [String]) -> () in
+                self.create_reference(matches)
+            }
+            
+            if count(b) > 0 {
+                next.unshift(Line(text:b,lineNumber:0,trailing:block._trailing))
+            }
+            
+            return []
+        }
+        
+        self.block[GruberDialect.BLOCK_QUOTE_HANDLER_KEY] = {
+            (var block : Line, inout next : Lines) -> [AnyObject]? in
+
+            // Handle quotes that have spaces before them
+            var text = block._text
+            var m = text.matches("(^|\n) +(\\>[\\s\\S]*)")
+            
+            if !m.isEmpty && (m.count >= 3) && (count(m[2]) > 0) {
+                var blockContents = text.replaceByRegEx("(^|\n) +\\>", replacement: ">");
+                next.unshift(Line(text: blockContents, lineNumber: block._lineNumber, trailing: block._trailing))
+                return []
+            }
+            
+            if !text.isMatch("^>") {
+                return []
+            }
+            
+            var jsonml : [AnyObject] = []
+            // separate out the leading abutting block, if any. I.e. in this case:
+            //
+            //  a
+            //  > b
+            //
+            if !text.isMatch("^>")  {
+                var newLines = text.split("\n")
+                var prev : [Line] = []
+                var line_no = block._lineNumber;
+                
+                // keep shifting lines until you find a crotchet
+                while !newLines.isEmpty && !newLines[0].isMatch("^>") {
+                    prev.append(Line(text: newLines.removeAtIndex(0), lineNumber: 0, trailing: "\n"))
+                    line_no++
+                }
+                
+                var abutting = Line(text: prev.reduce("", combine: {$0 + "\n" + $1._text}), lineNumber: block._lineNumber, trailing: "\n")
+                var emptyNextLines = Lines()
+                jsonml.append(self.processBlock(abutting, next: &emptyNextLines)!)
+                
+                // reassemble new block of just block quotes!
+                block = Line(text: "\n".join(newLines), lineNumber: line_no, trailing: block._trailing)
+                text = block._text
+            }
+            
+            // if the next block is also a blockquote merge it in
+            while !next.isEmpty() && next.line(0)._text.isMatch("$>") {
+                var b = next.shift()!
+                block = Line(text: text + block._trailing + b._text, lineNumber: block._lineNumber, trailing: b._trailing)
+                text = block._text
+            }
+            
+            // Strip off the leading "> " and re-process as a block.
+            var input = text.replaceByRegEx("^> ?", replacement: "").replace("\n>", replacement: "\n")
+            var old_tree = self.tree
+            var processedBlock = self.toTree(input, root: ["blockquote"])
+            /*var attr = self.extract_attr( processedBlock )
+            // If any link references were found get rid of them
+            if ( attr && attr.references ) {
+                delete attr.references;
+                // And then remove the attribute object if it's empty
+                if ( isEmpty( attr ) )
+                processedBlock.splice( 1, 1 );
+            }*/
+            
+            jsonml.append(processedBlock)
+            
+            return jsonml
+        }
+        
         // These characters are interesting elsewhere, so have rules for them so that
         // chunks of plain text blocks don't include them
         self.inline["]"] = {

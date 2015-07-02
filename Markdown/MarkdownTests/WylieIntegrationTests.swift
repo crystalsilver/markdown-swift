@@ -39,6 +39,10 @@ class WylieIntegrationTests : XCTestCase {
     func testLinks() {
         runTests("links", runXML: true, runHTML: true)
     }
+    
+    func testBlockQuotes() {
+        runTests("blockquotes", runXML: true, runHTML: false)
+    }
 
     func runTests(subDir : String, runXML : Bool, runHTML: Bool) -> () {
         let tests : [String:String] = getFilenames(subDir)
@@ -48,25 +52,28 @@ class WylieIntegrationTests : XCTestCase {
             let mdOutputFile = file.replace(".text", replacement: ".xml")
             let markdown = readFile(mdInputFile, type: "text")
             if !markdown.isBlank() {
-                let expected = readFile(mdOutputFile, type: "xml")
-                
-            println("-------------------------------------------------------------------------------")
+                println("-------------------------------------------------------------------------------")
                 println("    Running " + testName)
                 let md : Markdown = Markdown()
                 let result : [AnyObject] = md.parse(markdown)
                 XCTAssertNotNil(result, testName + " failed to yield a result.")
-                if runXML && !expected.isBlank() {
-                    println("")
-                    let xml = XmlRenderer().toXML(result, includeRoot: true)
-                    XCTAssertEqual(expected, xml, testName + " test failed")
-                    println("")
+                if runXML {
+                    let expected = readFile(mdOutputFile, type: "xml")
+                    if !expected.isBlank() {
+                        println("")
+                        let xml = XmlRenderer().toXML(result, includeRoot: true)
+                        XCTAssertEqual(expected, xml, testName + " test failed")
+                        println("")
+                    }
                 }
-                let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
-                if runHTML && !expectedHTML.isBlank() {
-                    println("")
-                    let html = HtmlRenderer().toHTML(result)
-                    XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
-                    println("")
+                if runHTML {
+                    let expectedHTML = readFile(file.replace(".text", replacement: ".html"), type: "html")
+                    if !expectedHTML.isBlank() {
+                        println("")
+                        let html = HtmlRenderer().toHTML(result)
+                        XCTAssertEqual(expectedHTML, html, testName + " HTML test failed")
+                        println("")
+                    }
                 }
             }
         }

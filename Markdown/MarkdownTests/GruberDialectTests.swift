@@ -268,6 +268,15 @@ class GruberDialectTests: XCTestCase {
         println(HtmlRenderer().toHTML(result))
     }
     
+    func testBlockQuoteSimple() {
+        var text = "> Blockquote"
+        
+        var result = self.gruberDialect.toTree(text)
+        
+        println(result.description)
+        println(HtmlRenderer().toHTML(result))
+    }
+    
     func runBlockHandler(name : String, line: Line) -> [AnyObject]? {
         var lines : Lines = Lines()
         return self.gruberDialect.block[name]!(line, &lines)
