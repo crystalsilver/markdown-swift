@@ -13,7 +13,7 @@ struct Lines : Printable {
     var description : String {
         var text:String = ""
         for line in _lines {
-            print(line._text + line._trailing)
+            text += line._text + line._trailing
         }
         return text
     }

@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Markdown
 
 class GruberDialectTests: XCTestCase {
     var gruberDialect : GruberDialect! = nil
@@ -247,6 +248,15 @@ class GruberDialectTests: XCTestCase {
         var result = self.gruberDialect.toTree(text)
         
         println(result.description)
+    }
+    
+    func testReferenceLink() {
+        var text = "A [link using a reference][1].\n\n[1]: http://reference.com\n\n"
+        
+        var result = self.gruberDialect.toTree(text)
+        
+        println(result.description)
+        println(HtmlRenderer().toHTML(result))
     }
     
     func runBlockHandler(name : String, line: Line) -> [AnyObject]? {

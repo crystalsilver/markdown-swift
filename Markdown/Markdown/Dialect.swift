@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Markdown
 
 class Dialect {
     var inline : Dictionary<String, (String) -> [AnyObject]> = [:]
@@ -17,6 +18,7 @@ class Dialect {
     var __order__ : [String]
     var __states : [String:[AnyObject]] = [:]
     var tree : [AnyObject]
+    var references : [String:Ref] = [:]
     
     // A robust regexp for matching URLs. Thanks: https://gist.github.com/dperini/729294
     let URL_REG_EX : String = "(?:(?:https?|ftp):\\/\\/)(?:\\S+(?::\\S*)?@)?(?:(?!(?:10|127)(?:\\.\\d{1,3}){3})(?!(?:169\\.254|192\\.168)(?:\\.\\d{1,3}){2})(?!172\\.(?:1[6-9]|2\\d|3[0-1])(?:\\.\\d{1,3}){2})(?:[1-9]\\d?|1\\d\\d|2[01]\\d|22[0-3])(?:\\.(?:1?\\d{1,2}|2[0-4]\\d|25[0-5])){2}(?:\\.(?:[1-9]\\d?|1\\d\\d|2[0-4]\\d|25[0-4]))|(?:(?:[a-z\u{00a1}-\u{ffff0}-9]-*)*[a-z\u{00a1}-\u{ffff0}-9]+)(?:\\.(?:[a-z\u{00a1}-\\u{ffff0}-9]+-?)*[a-z\u{00a1}-\u{ffff0}-9]+)*(?:\\.(?:[a-z\u{00a1}-\u{ffff}]{2,})))(?::\\d{2,5})?(?:\\/[^\\s]*)?"
@@ -120,6 +122,8 @@ class Dialect {
                 self.tree.append(processedLine!)
             }
         }
+        
+        self.tree.insert(self.references, atIndex:1)
         
         return self.tree
     }
@@ -273,15 +277,8 @@ class Dialect {
             }
         }
     }
-    
-    func extract_attr(jsonml : [AnyObject]) -> [String:AnyObject] {
-        var result : [String:AnyObject] = [:]
-        if jsonml.count > 1 {
-            let dict = jsonml[1] as? [String:AnyObject]
-            if dict != nil {
-                result = dict!
-            }
-        }
-        return result
+
+    func addRef(ref: Ref) {
+        self.references[ref.refId] = ref
     }
 }

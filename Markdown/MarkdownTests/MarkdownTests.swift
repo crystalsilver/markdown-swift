@@ -52,8 +52,8 @@ class MarkdownTests: XCTestCase {
         
         XCTAssertFalse(result.isEmpty)
         XCTAssertEqual("markdown", result[0] as! String)
-        XCTAssertEqual(2, result.count)
-        var node = result[1] as! [AnyObject]
+        XCTAssertEqual(3, result.count)
+        var node = result[2] as! [AnyObject]
         var jsonML = node[0] as! [AnyObject]
         XCTAssertEqual("uchen_block", jsonML[0] as! String, "Expecting uchen JsonML block")
         XCTAssertEqual("རྡོརྗེ་སངཡེ་ཇིནཔ་ལོསལ་རིནཔོཆེ་དདདདདདདེརྡོརྗེ་སངཡེ", jsonML[2] as! String, "Not translated correctly")

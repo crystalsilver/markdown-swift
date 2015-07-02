@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Markdown
 
 class GruberDialect : Dialect {
     // Key values determine block handler orders
@@ -385,8 +386,7 @@ class GruberDialect : Dialect {
             var regExp = "^\\s*\\[(.*?)\\]:\\s*(\\S+)(?:\\s+(?:(['\"])(.*?)\\3|\\((.*?)\\)))?\\n?"
             if orig.isMatch(regExp) {
                 var m : [String] = orig.matches(regExp)
-                var attrs : [String:AnyObject] = self.create_attrs()
-                self.create_reference(&attrs, m: &m);
+                self.create_reference(m)
                 return [count(m[0])]
             }
             
@@ -454,37 +454,24 @@ class GruberDialect : Dialect {
         buildBlockOrder()
         buildInlinePatterns()
     }
-    
-    // A helper function to create attributes
-    func create_attrs() -> [String:AnyObject] {
-        var attrs : [String:AnyObject] = extract_attr(self.tree)
-        if attrs.isEmpty {
-            self.tree.insert(attrs, atIndex:1)
-        }
-
-        // make a references hash if it doesn't exist
-        if attrs["references"] == nil {
-            attrs["references"] = [String:AnyObject]()
-        }
-
-        return attrs
-    }
 
     // Create references for attributes
-    func create_reference(inout attrs : [String:AnyObject],
-                          inout m : [String]) {
-        if m.count >= 3 && m[2].isMatch("^<") && m[2].isMatch(">$") {
-            m[2] = m[2].substr(1, length: count(m[2]) - 1)
+    func create_reference(details: [String]) {
+        var href = details[2]
+        if details.count >= 3 &&
+           details[2].isMatch("^<") &&
+           details[2].isMatch(">$") {
+            href = details[2].substr(1, length: count(details[2]) - 1)
         }
-
-        var ref = ["href": m[2]]
-        var references : [String:AnyObject] = attrs["references"] as! [String:AnyObject]
-        references[m[1].lowercaseString] = ref
-    
-        if m.count == 5 && count(m[4]) > 0 {
-            ref["title"] = m[4]
-        } else if m.count == 6 && count(m[5]) > 0  {
-            ref["title"] = m[5]
+        
+        var title = ""
+        if details.count == 5 && count(details[4]) > 0 {
+            title = details[4]
+        } else if details.count == 6 && count(details[5]) > 0  {
+            title = details[5]
         }
+        
+        var ref = Ref(rid: details[1].lowercaseString, title: title, href: href)
+        addRef(ref)
     }
 }

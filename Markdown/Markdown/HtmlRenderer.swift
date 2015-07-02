@@ -11,31 +11,26 @@ public class HtmlRenderer: Renderer {
     public override init() { super.init() }
 
     public func toHTML(source : [AnyObject]) -> String {
-        var input = self.toHTMLTree(source, preprocessTreeNode: nil)
+        var src : [AnyObject]? = source
+        var input = self.toHTMLTree(&src, preprocessTreeNode: nil)
         return self.renderHTML(input, includeRoot: true)
     }
     
     public func toHTMLTree(input: String, dialectName : String, options : AnyObject) -> [AnyObject] {
         let md = Markdown(dialectName: dialectName)
-        let result : [AnyObject] = md.parse(input)
-        return self.toHTMLTree(result, preprocessTreeNode: nil)
+        var result : [AnyObject]? = md.parse(input)
+        return self.toHTMLTree(&result, preprocessTreeNode: nil)
     }
     
-    public func toHTMLTree(input : [AnyObject],
-                           preprocessTreeNode : (([AnyObject],[String:String]) -> [AnyObject])!) -> [AnyObject] {
+    public func toHTMLTree(inout input : [AnyObject]?,
+                           preprocessTreeNode : (([AnyObject],[String:Ref]) -> [AnyObject])!) -> [AnyObject] {
         // Convert the MD tree to an HTML tree
         
         // remove references from the tree
-        var refs :[String:String] = [:]
-        let attrs : [String:AnyObject]? = extract_attr(input)
-        if attrs != nil {
-            let rs = attrs!["refs"] as? [String:String]
-            if rs != nil {
-                refs = rs!
-            }
-        }
-        
-        var html = convert_tree_to_html(input, refs: refs, preprocessTreeNode: preprocessTreeNode)
+        var refs : [String:Ref]
+        var i = input!
+        refs = i[1] as! [String:Ref]
+        var html = convert_tree_to_html(&input, refs: refs, preprocessTreeNode: preprocessTreeNode)
         //todomerge_text_nodes(html)
         
         return html
@@ -53,9 +48,9 @@ public class HtmlRenderer: Renderer {
         }
     }
     
-    func convert_tree_to_html(tree : [AnyObject]?,
-                              refs : [String:String],
-                              preprocessTreeNode : (([AnyObject],[String:String]) -> [AnyObject])!) -> [AnyObject] {
+    func convert_tree_to_html(inout tree : [AnyObject]?,
+                              refs : [String:Ref],
+                              preprocessTreeNode : (([AnyObject],[String:Ref]) -> [AnyObject])!) -> [AnyObject] {
         if tree == nil {
             return []
         }
@@ -73,7 +68,8 @@ public class HtmlRenderer: Renderer {
         // convert this node
         if !(jsonml[0] is String) {
             if jsonml[0] is [AnyObject] {
-                return convert_tree_to_html(jsonml[0] as? [AnyObject], refs: refs, preprocessTreeNode: preprocessTreeNode)
+                var subtree : [AnyObject]? = jsonml[0] as? [AnyObject]
+                return convert_tree_to_html(&subtree, refs: refs, preprocessTreeNode: preprocessTreeNode)
             } else {
                 return []
             }
@@ -131,15 +127,17 @@ public class HtmlRenderer: Renderer {
             
                         // if the reference exists, make the link
                         if ref != nil {
-                            attributes.removeValueForKey("ref")
+                            attrs!.removeValueForKey("ref")
                             // add in the href if present
-                            // todo attributes["href"] = ref!["href"]
+                            attrs!["href"] = ref!.href
                             
                             // get rid of the unneeded original text
-                            attributes.removeValueForKey("original")
-                        } /*else {
-                            return (attributes.indexForKey("original") != nil) ? attributes["original"]! : []
-                        }*/
+                            attrs!.removeValueForKey("original")
+                            
+                            jsonml[1] = attrs!
+                        } else {
+                            return (attributes.indexForKey("original") != nil) ? [attributes["original"]!] : []
+                        }
                     }
                 }
             case "img_ref":
@@ -188,8 +186,8 @@ public class HtmlRenderer: Renderer {
     
         for l; l < jsonml.count; ++l {
             if (jsonml[l] is [AnyObject]) {
-                var node : [AnyObject] = jsonml[l] as! [AnyObject]
-                jsonml[l] = convert_tree_to_html(node, refs: refs, preprocessTreeNode: preprocessTreeNode)
+                var node : [AnyObject]? = jsonml[l] as! [AnyObject]
+                jsonml[l] = convert_tree_to_html(&node, refs: refs, preprocessTreeNode: preprocessTreeNode)
             }
         }
     
