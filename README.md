@@ -1,4 +1,4 @@
-https://travis-ci.org/leannenorthrop/markdown-swift.svg?branch=master
+![](https://travis-ci.org/leannenorthrop/markdown-swift.svg?branch=master)
 
 # markdown-swift
 
@@ -7,4 +7,8 @@ language style. Will convert this project to CocoaPod once a satisfactory codeba
 
 ## Building
 
-Can be built either within XCode or on OSx command-line: `xcodebuild clean build test -scheme Markdown -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.3'`.
+Can be built either within XCode or on OSx command-line: 
+
+```
+xcodebuild clean build test -scheme Markdown -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.3'
+```
