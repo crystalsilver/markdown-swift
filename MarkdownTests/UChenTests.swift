@@ -30,7 +30,8 @@ class UChenTests: XCTestCase {
         XCTAssertEqual("སང་གྱེ", uchen.translate("sang gye"), "Not producing expected output")
         XCTAssertEqual("དུསུམ", uchen.translate("dusum"), "Wrong uchen translation for 'dusum'")
         XCTAssertEqual("དུསུམ་ཁེཡནཔ", uchen.translate("dusum kheynpa"), "Wrong uchen translation for sang gye sang gye rdorje")
-        XCTAssertEqual("࿅", uchen.translate("~dorje"), "Wrong uchen translation for '~dorje'")        
+        XCTAssertEqual("࿅", uchen.translate("~dorje"), "Wrong uchen translation for '~dorje'")
+        XCTAssertEqual("࿅", uchen.translate("~dorje"), "Wrong uchen translation for '~dorje'")
     }
     
 }
