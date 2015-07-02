@@ -1,4 +1,4 @@
-![](https://travis-ci.org/leannenorthrop/markdown-swift.svg?branch=master)
+Travis CI: ![](https://travis-ci.org/leannenorthrop/markdown-swift.svg?branch=master)
 
 # markdown-swift
 
