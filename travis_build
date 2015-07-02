@@ -1,2 +1,2 @@
 #!/bin/bash
-xcodebuild -scheme Markdown -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.3'
+xcodebuild clean build test -scheme Markdown -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.3'
