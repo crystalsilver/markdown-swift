@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<markdown><para>This is <link_ref ref="google" original="[google].">google</link_ref>. <link_ref ref="google" original="[Google] ">Google</link_ref> and <link_ref ref="google" original="[this][GoOgLe] ">this</link_ref> are the same thing too</para><para></para></markdown>

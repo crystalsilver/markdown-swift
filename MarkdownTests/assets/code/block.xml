@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<markdown><para>Here is an example of AppleScript:</para><code_block>tell application &quot;Foo&quot;
+    beep
+end tell
+	tab</code_block></markdown>
