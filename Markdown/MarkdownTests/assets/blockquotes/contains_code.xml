@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<markdown><blockquote><para>There&#39;s a code block in here:</para><code_block> SET foo = TRUE
-
- IF foo GOTO 10</code_block><para> Wasn&#39;t that nice?</para></blockquote><para></para></markdown>

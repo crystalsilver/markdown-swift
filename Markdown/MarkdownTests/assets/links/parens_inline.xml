@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-
-<markdown><para><link href="/url(test)" title="title">Inline link</link> with non-escaped parens.</para></markdown>
